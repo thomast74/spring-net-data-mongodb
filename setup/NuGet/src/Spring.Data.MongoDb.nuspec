@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+		<id>Spring.Data.MongoDb</id>
+		<title>Spring.Data.MongoDb</title>
+		<projectUrl>http://www.github.com/thomast74/spring-net-data-mongodb/</projectUrl>
+		<licenseUrl>http://www.springframework.net/license.html</licenseUrl>
+		<iconUrl>http://springframework.net/images/SpringSource_Leaves32x32.png</iconUrl>
+		<version>0.0.0</version> <!-- this value is a placeholder replaced by build script -->
+		<authors>SpringSource</authors>
+		<description>The Spring Data MongoDB aims to provide a familiar and consistent Spring-based programming model for for new data stores</description>
+		<summary>
+			The Spring Data MongoDB aims to provide a familiar and consistent Spring-based programming model for for new data stores while retaining store-specific features and capabilities. 
+			The Spring Data MongoDB project provides integration with the MongoDB document database. 
+			Key functional areas of Spring Data MongoDB are a POCO centric model for interacting with a MongoDB DBCollection and easily writing a Repository style data access layer.
+		</summary>
+		<language>en-US</language>
+		<dependencies>
+			<dependency id="Spring.Core" version="2.0.0" />
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="..\..\..\bin\net\3.5\Spring.Data.MongoDb.dll" target="lib\net35" />
+		<file src="..\..\..\bin\net\3.5\Spring.Data.MongoDb.pdb" target="lib\net35" />
+		<file src="..\..\..\bin\net\3.5\Spring.Data.MongoDb.xml" target="lib\net35" />
+		<file src="..\..\..\bin\net\4.0\Spring.Data.MongoDb.dll" target="lib\net40" />
+		<file src="..\..\..\bin\net\4.0\Spring.Data.MongoDb.pdb" target="lib\net40" />
+		<file src="..\..\..\bin\net\4.0\Spring.Data.MongoDb.xml" target="lib\net40" />
+	</files>
+</package>

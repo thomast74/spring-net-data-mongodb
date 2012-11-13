@@ -1,0 +1,5 @@
+SPRING DATA MONGODB .NET CHANGELOG
+==================================
+https://github.com/thomast74/spring-net-data-mongodb
+
+*** Release Version 1.0.0 ???? ?, 2012 ***

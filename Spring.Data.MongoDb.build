@@ -116,13 +116,6 @@
         </items>
       </in>
       <do>
-        <property name="reference-name" value="Common.Logging" />
-        <echo message="Poking file ${filename} to set hint paths for ${reference-name}" />
-        <call target="set-assembly-hint-path" />
-
-        <property name="reference-name" value="Spring.Data" />
-        <echo message="Poking file ${filename} to set hint paths for ${reference-name}" />
-        <call target="set-assembly-hint-path" />
       </do>
     </foreach>
   </target>
@@ -342,7 +335,7 @@ ${tool.dir}       : dir for tools
     <property name="test.bin.dir" value="${build.dir}" if="${not property::exists('test.bin.dir')}" />
     <echo message="Unit Testing ${test.assemblyname} in ${test.bin.dir}" />
 
-    <exec program="${tool.dir}/nunit/net-2.0/nunit-console-x86.exe" workingdir="${test.bin.dir}" verbose="true">
+    <exec program="${tool.dir}/nunit/net-3.5/bin/nunit-console-x86.exe" workingdir="${test.bin.dir}" verbose="true">
       <arg line="${test.assemblyfile}" />
       <arg value="/xml:${test.assemblyname}.dll-TestResults.xml" />
       <arg value="/nologo" />
@@ -383,7 +376,7 @@ ${tool.dir}       : dir for tools
       <arg value="//ea" />
       <arg value="CoverageExcludeAttribute" />
       <arg value="//q" />
-      <arg path="${tool.dir}/nunit/net-2.0/nunit-console-x86.exe" />
+      <arg path="${tool.dir}/nunit/net-3.5/bin/nunit-console-x86.exe" />
       <arg line="${test.assemblyfile}" />
       <arg value="/xml:${test.assemblyname}.dll-TestResults.xml" />
       <arg value="/nologo" />
@@ -391,7 +384,7 @@ ${tool.dir}       : dir for tools
 
       <arg value="/framework:${nant.settings.currentframework}" />
 
-      <!-- <arg value="/framework:net-2.0" /> -->
+      <!-- <arg value="/framework:net-3.5" /> -->
     </exec>
 
   </target>

@@ -4,5 +4,84 @@
         <name>Spring.Data.MongoDb.Log4Net</name>
     </assembly>
     <members>
+        <member name="T:Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender">
+            <summary>
+            MongoDb Log4Net Appender
+            </summary>
+        </member>
+        <member name="F:Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender.DefaultDatabaseName">
+            <summary>
+            Default database name if no name is specified in the appender configuration
+            </summary>
+        </member>
+        <member name="F:Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender.DefaultCollectionName">
+            <summary>
+            Default collection name if no CollectionPattern was specified in the appender configuration
+            </summary>
+        </member>
+        <member name="M:Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender.#ctor">
+            <summary>
+            Creates the MongoDb Log4Net Appender
+            </summary>
+        </member>
+        <member name="M:Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender.AddParameter(Spring.Data.MongoDb.Log4Net.MongoAppenderParameter)">
+            <summary>
+            Define parameter to log specific elements of the logging event.
+            </summary>
+            <param name="parameter">Specifies the element key name and value pattern</param>
+        </member>
+        <member name="M:Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender.Append(log4net.Core.LoggingEvent)">
+            <summary>
+            Loges event into MongoDB database collection.
+            If no paramaters specified default fields are written into document.
+            </summary>
+            <param name="loggingEvent">Event log into database collection</param>
+        </member>
+        <member name="M:Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="P:Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender.ConnectionString">
+            <summary>
+            Connection to connect to a MongoDB instance or cluster
+            mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]
+            More details can be found at http://www.mongodb.org/display/DOCS/Connections
+            
+            If no database specified <see cref="F:Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender.DefaultDatabaseName"/>
+            </summary>
+        </member>
+        <member name="P:Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender.Database">
+            <summary>
+            Defined the database name to use for logging informaiton to a mongoDB server
+            </summary>
+        </member>
+        <member name="P:Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender.CollectionPattern">
+            <summary>
+            PatternLayout to defined the collection name
+            If no CollectionPattern specified <see cref="F:Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender.DefaultCollectionName"/>
+            </summary>
+        </member>
+        <member name="P:Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender.ApplicationId">
+            <summary>
+            An Id to identify the application if more then one application is using the 
+            same database and collection for storing logging information
+            </summary>
+        </member>
+        <member name="T:Spring.Data.MongoDb.Log4Net.MongoAppenderParameter">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Spring.Data.MongoDb.Log4Net.MongoAppenderParameter.ParameterName">
+            <summary>
+            Defines the element key name in the mongoDB document
+            </summary>
+        </member>
+        <member name="P:Spring.Data.MongoDb.Log4Net.MongoAppenderParameter.Layout">
+            <summary>
+            Defined the pattern to use for the specified element key
+            </summary>
+        </member>
     </members>
 </doc>

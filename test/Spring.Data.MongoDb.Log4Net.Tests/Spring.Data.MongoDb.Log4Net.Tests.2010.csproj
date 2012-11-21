@@ -33,6 +33,15 @@
     <NoWarn>618</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\..\lib\net\4.0\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Bson">
+      <HintPath>..\..\lib\net\4.0\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver">
+      <HintPath>..\..\lib\net\4.0\MongoDB.Driver.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\..\lib\net\4.0\nunit.framework.dll</HintPath>
     </Reference>
@@ -40,11 +49,14 @@
       <HintPath>..\..\lib\net\4.0\Rhino.Mocks.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\src\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Data\MongoDb\Log4Net\MongoLog4NetAppenderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -54,10 +66,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Data\MongoDb\Log4Net\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Spring.Data.MongoDb.Log4Net.Tests.dll.config" />
+    <None Include="Spring.Data.MongoDb.Log4Net.Tests.dll.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

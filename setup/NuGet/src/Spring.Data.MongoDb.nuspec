@@ -21,11 +21,8 @@
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="..\..\..\bin\net\3.5\Spring.Data.MongoDb.dll" target="lib\net35" />
-		<file src="..\..\..\bin\net\3.5\Spring.Data.MongoDb.pdb" target="lib\net35" />
-		<file src="..\..\..\bin\net\3.5\Spring.Data.MongoDb.xml" target="lib\net35" />
-		<file src="..\..\..\bin\net\4.0\Spring.Data.MongoDb.dll" target="lib\net40" />
-		<file src="..\..\..\bin\net\4.0\Spring.Data.MongoDb.pdb" target="lib\net40" />
-		<file src="..\..\..\bin\net\4.0\Spring.Data.MongoDb.xml" target="lib\net40" />
+		<file src="..\..\..\bin\net\4.0\Release\Spring.Data.MongoDb.dll" target="lib\net40" />
+		<file src="..\..\..\bin\net\4.0\Release\Spring.Data.MongoDb.pdb" target="lib\net40" />
+		<file src="..\..\..\bin\net\4.0\Release\Spring.Data.MongoDb.xml" target="lib\net40" />
 	</files>
 </package>

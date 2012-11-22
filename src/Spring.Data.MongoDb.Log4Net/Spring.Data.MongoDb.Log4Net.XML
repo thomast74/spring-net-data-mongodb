@@ -6,8 +6,9 @@
     <members>
         <member name="T:Spring.Data.MongoDb.Log4Net.MongoAppenderParameter">
             <summary>
-            
+            Parameter element within appender configuration for defining parameters to log into document
             </summary>
+            <author>Thomas Trageser</author>
         </member>
         <member name="P:Spring.Data.MongoDb.Log4Net.MongoAppenderParameter.ParameterName">
             <summary>
@@ -23,6 +24,7 @@
             <summary>
             MongoDb Log4Net Appender
             </summary>
+            <author>Thomas Trageser</author>
         </member>
         <member name="F:Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender.DefaultDatabaseName">
             <summary>

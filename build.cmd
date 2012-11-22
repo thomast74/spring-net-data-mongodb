@@ -1,13 +1,5 @@
-REM other targets are:
-REM 'build'
-REM 'test'
-REM 'test-integration'
-
-@ECHO OFF
-cls
-@ECHO building...
-
-tools\nant\bin\nant.exe %1 %2 %3 %4 %5 %6 %7 %8 %9 -f:Spring.Data.MongoDb.build > buildlog.txt
-
-@ECHO displaying log file...
+@echo off
+@echo Running full Build Script, capturing output to buildlog.txt file...
+tools\NAnt\bin\nant.exe build -f:Spring.Data.MongoDb.build > buildlog.txt
+@echo Launching text file viewer to display buildlog.txt contents...
 start "ignored but required placeholder window title argument" buildlog.txt

@@ -58,6 +58,7 @@
     </Compile>
     <Compile Include="Data\MongoDb\Log4Net\MongoLog4NetAppenderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestCategory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Spring.Data.MongoDb.Log4Net\Spring.Data.MongoDb.Log4Net.2010.csproj">

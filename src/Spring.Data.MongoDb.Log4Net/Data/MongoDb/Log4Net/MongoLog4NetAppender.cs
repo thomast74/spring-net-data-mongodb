@@ -117,7 +117,7 @@ namespace Spring.Data.MongoDb.Log4Net
             var dbo = new BsonDocument();
             foreach (var parameter in _parameters)
             {
-                dbo.Add(parameter.ParameterName, BsonValue.Create(parameter.Layout.Format(loggingEvent).ToString()));
+                dbo.Add(parameter.ParameterName, BsonValue.Create(parameter.Layout.Format(loggingEvent)));
             }
 
             return dbo;

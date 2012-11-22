@@ -39,10 +39,10 @@ namespace Spring.Data.MongoDb.Log4Net
                 <log4net>
 	                <appender name='mongo' type='Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender, Spring.Data.MongoDb.Log4Net'>
 		                <connectionString value='mongodb://localhost' />
-		                <field>
-			                <name value='timestamp' />
+		                <parameter>
+			                <parameterName value='timestamp' />
 			                <layout type='log4net.Layout.RawTimeStampLayout' />
-		                </field>
+		                </parameter>
 	                </appender>
 	                <root><level value='ALL' /><appender-ref ref='mongo' /></root></log4net>
                 ")));

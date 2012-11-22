@@ -1,0 +1,3 @@
+[submodule "samples"]
+	path = samples
+	url = git@github.com:thomast74/spring-net-data-mongodb-samples.git

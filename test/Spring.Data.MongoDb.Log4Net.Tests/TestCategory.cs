@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MongoAppenderParameter.cs" company="The original author or authors.">
+// <copyright file="TestCategory.cs" company="The original author or authors.">
 //   Copyright 2002-2012 the original author or authors.
 //   
 //   Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
@@ -13,25 +13,27 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using log4net.Layout;
-
-
-namespace Spring.Data.MongoDb.Log4Net
+namespace Spring
 {
     /// <summary>
-    /// Parameter element within appender configuration for defining parameters to log into document
+    /// Test Categories
     /// </summary>
     /// <author>Thomas Trageser</author>
-    public class MongoAppenderParameter
+    public static class TestCategory
     {
         /// <summary>
-        /// Defines the element key name in the mongoDB document
+        /// Integration Test
         /// </summary>
-        public string ParameterName { get; set; }
+        public const string Integration = "Integration";
 
         /// <summary>
-        /// Defined the pattern to use for the specified element key
+        /// Lifecycle Integration Test
         /// </summary>
-        public IRawLayout Layout { get; set; }
+        public const string LifecycleIntegration = "LifecycleIntegration";
+
+        /// <summary>
+        /// Unit Test
+        /// </summary>
+        public const string Unit = "Unit";
     }
 }

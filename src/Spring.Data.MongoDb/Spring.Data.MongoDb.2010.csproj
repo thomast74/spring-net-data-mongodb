@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8B4B3653-EAED-4F0B-9FF3-B6D0639529FA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Spring</RootNamespace>
+    <AssemblyName>Spring.Data.MongoDb</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\build\VS.Net.2010\Spring.Data.MongoDb\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <WarningsAsErrors>1591</WarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\build\VS.Net.2010\Spring.Data.MongoDb\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Common.Logging, Version=2.1.2.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Common.Logging.2.1.2\lib\net40\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Bson, Version=1.7.0.4714, Culture=neutral, PublicKeyToken=f686731cfb9cc103, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\mongocsharpdriver.1.7\lib\net35\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver, Version=1.7.0.4714, Culture=neutral, PublicKeyToken=f686731cfb9cc103, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\mongocsharpdriver.1.7\lib\net35\MongoDB.Driver.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Aop">
+      <HintPath>..\..\lib\net-4.0\Spring.Aop.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Core">
+      <HintPath>..\..\lib\net-4.0\Spring.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Data">
+      <HintPath>..\..\lib\net-4.0\Spring.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Data\MongoDb\Config\ReadPreferenceConverter.cs" />
+    <Compile Include="Data\MongoDb\Config\WriteConcernConverter.cs" />
+    <Compile Include="Data\MongoDb\Core\CollectionOptions.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\IMongoConverter.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\QueryMapper.cs" />
+    <Compile Include="Data\MongoDb\Core\FindAndModifyOptions.cs" />
+    <Compile Include="Data\MongoDb\Core\Geo\Distance.cs" />
+    <Compile Include="Data\MongoDb\Core\Geo\IMetric.cs" />
+    <Compile Include="Data\MongoDb\Core\Geo\Metrics.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapping\Annotation\DBRefAttribute.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapping\Annotation\DocumentAttribute.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapping\Annotation\FieldAttribute.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapping\BasicMongoPersistentEntity.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapping\BasicMongoPersistentProperty.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapping\CachingMongoPersistentProperty.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapping\IMongoPersistentEntity.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapping\IMongoPersistentProperty.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\IMongoReader.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\IMongoWriter.cs" />
+    <Compile Include="Data\MongoDb\Core\DbHolder.cs" />
+    <Compile Include="Data\MongoDb\Core\ICollectionCallback.cs" />
+    <Compile Include="Data\MongoDb\Core\IDatabaseCallback.cs" />
+    <Compile Include="Data\MongoDb\Core\IDocumentCallbackHandler.cs" />
+    <Compile Include="Data\MongoDb\Core\IIndexOperations.cs" />
+    <Compile Include="Data\MongoDb\Core\IMongoOperations.cs" />
+    <Compile Include="Data\MongoDb\Core\Index\IIndexDefinition.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapping\MongoMappingContext.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapping\MongoPersistentPropertyComparer.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapping\MongoSimpleTypes.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapping\PropertyToFieldNameConverter.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapreduce\GroupByResults.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapreduce\MapReduceCounts.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapreduce\MapReduceResults.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapreduce\MapReduceTiming.cs" />
+    <Compile Include="Data\MongoDb\Core\MongoDbUtils.cs" />
+    <Compile Include="Data\MongoDb\Core\MongoExceptionTranslator.cs" />
+    <Compile Include="Data\MongoDb\Core\MongoServerFactoryObject.cs" />
+    <Compile Include="Data\MongoDb\Core\MongoServerSettingsFactoryObject.cs" />
+    <Compile Include="Data\MongoDb\Core\MongoSynchronization.cs" />
+    <Compile Include="Data\MongoDb\Core\MongoTemplate.cs" />
+    <Compile Include="Data\MongoDb\Core\Query\Criteria.cs" />
+    <Compile Include="Data\MongoDb\Core\Query\Field.cs" />
+    <Compile Include="Data\MongoDb\Core\Query\ICriteria.cs" />
+    <Compile Include="Data\MongoDb\Core\Query\NearQuery.cs" />
+    <Compile Include="Data\MongoDb\Core\Query\Order.cs" />
+    <Compile Include="Data\MongoDb\Core\Query\Query.cs" />
+    <Compile Include="Data\MongoDb\Core\Query\SerializationUtils.cs" />
+    <Compile Include="Data\MongoDb\Core\SimpleMongoDbFactory.cs" />
+    <Compile Include="Data\MongoDb\Core\Geo\Circle.cs" />
+    <Compile Include="Data\MongoDb\Core\Geo\IShape.cs" />
+    <Compile Include="Data\MongoDb\Core\Geo\Point.cs" />
+    <Compile Include="Data\MongoDb\Core\WriteConcernResultChecking.cs" />
+    <Compile Include="Data\MongoDb\IMongoDbFactory.cs" />
+    <Compile Include="Data\MongoDb\InvalidMongoDbApiUsageException.cs" />
+    <Compile Include="Data\MongoDb\MongoCollectionUtils.cs" />
+    <Compile Include="Data\MongoDb\Pluralizer.cs" />
+    <Compile Include="Data\MongoDb\UncategorizedMongoDbException.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

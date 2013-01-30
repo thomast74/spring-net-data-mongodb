@@ -10,6 +10,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common files", "Common file
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spring.Data.MongoDb.Log4Net.Tests.2010", "test\Spring.Data.MongoDb.Log4Net.Tests\Spring.Data.MongoDb.Log4Net.Tests.2010.csproj", "{D573EB5B-6B4B-4C4F-A64E-C1E917A37F49}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spring.Data.MongoDb.Tests.2010", "test\Spring.Data.MongoDb.Tests\Spring.Data.MongoDb.Tests.2010.csproj", "{A5DADCC6-56C0-4E69-8E0C-8F0743E27C2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spring.Data.MongoDb.2010", "src\Spring.Data.MongoDb\Spring.Data.MongoDb.2010.csproj", "{8B4B3653-EAED-4F0B-9FF3-B6D0639529FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +28,14 @@ Global
 		{D573EB5B-6B4B-4C4F-A64E-C1E917A37F49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D573EB5B-6B4B-4C4F-A64E-C1E917A37F49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D573EB5B-6B4B-4C4F-A64E-C1E917A37F49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5DADCC6-56C0-4E69-8E0C-8F0743E27C2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5DADCC6-56C0-4E69-8E0C-8F0743E27C2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5DADCC6-56C0-4E69-8E0C-8F0743E27C2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5DADCC6-56C0-4E69-8E0C-8F0743E27C2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B4B3653-EAED-4F0B-9FF3-B6D0639529FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B4B3653-EAED-4F0B-9FF3-B6D0639529FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B4B3653-EAED-4F0B-9FF3-B6D0639529FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B4B3653-EAED-4F0B-9FF3-B6D0639529FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

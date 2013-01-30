@@ -4,22 +4,6 @@
         <name>Spring.Data.MongoDb.Log4Net</name>
     </assembly>
     <members>
-        <member name="T:Spring.Data.MongoDb.Log4Net.MongoAppenderParameter">
-            <summary>
-            Parameter element within appender configuration for defining parameters to log into document
-            </summary>
-            <author>Thomas Trageser</author>
-        </member>
-        <member name="P:Spring.Data.MongoDb.Log4Net.MongoAppenderParameter.ParameterName">
-            <summary>
-            Defines the element key name in the mongoDB document
-            </summary>
-        </member>
-        <member name="P:Spring.Data.MongoDb.Log4Net.MongoAppenderParameter.Layout">
-            <summary>
-            Defined the pattern to use for the specified element key
-            </summary>
-        </member>
         <member name="T:Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender">
             <summary>
             MongoDb Log4Net Appender
@@ -83,6 +67,22 @@
             <summary>
             An Id to identify the application if more then one application is using the 
             same database and collection for storing logging information
+            </summary>
+        </member>
+        <member name="T:Spring.Data.MongoDb.Log4Net.MongoAppenderParameter">
+            <summary>
+            Parameter element within appender configuration for defining parameters to log into document
+            </summary>
+            <author>Thomas Trageser</author>
+        </member>
+        <member name="P:Spring.Data.MongoDb.Log4Net.MongoAppenderParameter.ParameterName">
+            <summary>
+            Defines the element key name in the mongoDB document
+            </summary>
+        </member>
+        <member name="P:Spring.Data.MongoDb.Log4Net.MongoAppenderParameter.Layout">
+            <summary>
+            Defined the pattern to use for the specified element key
             </summary>
         </member>
     </members>

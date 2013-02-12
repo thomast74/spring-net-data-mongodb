@@ -72,10 +72,17 @@
     <Compile Include="..\..\src\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Data\MongoDb\Convert\QueryMapperTests.cs" />
+    <Compile Include="Data\MongoDb\Config\AbstractMongoConfigurationTests.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\CustomConversionsTests.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\MappingMongoConverterTests.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\QueryMapperTests.cs" />
     <Compile Include="Data\MongoDb\Core\Mapping\BasicMongoPersistentEntityTests.cs" />
     <Compile Include="Data\MongoDb\Core\Mapping\BasicMongoPersistentPropertyTests.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapping\GeoIndexedAppConfig.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapping\GeoIndexedTests.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapping\GeoLocation.cs" />
     <Compile Include="Data\MongoDb\Core\Mapping\MongoMappingContextTests.cs" />
+    <Compile Include="Data\MongoDb\Core\Mapping\MongoPersistentPropertyComparerTests.cs" />
     <Compile Include="Data\MongoDb\Core\MongoAdminIntegrationTests.cs" />
     <Compile Include="Data\MongoDb\Core\MongoDbUtilsTests.cs" />
     <Compile Include="Data\MongoDb\Core\MongoOperationsTests.cs" />
@@ -103,9 +110,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\infrastructure.xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Data\MongoDb\Core\Convert\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo "Copying .xml files for tests"

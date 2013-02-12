@@ -65,15 +65,28 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Data\MongoDb\Config\AbstractMongoConfiguration.cs" />
     <Compile Include="Data\MongoDb\Config\ReadPreferenceConverter.cs" />
     <Compile Include="Data\MongoDb\Config\WriteConcernConverter.cs" />
     <Compile Include="Data\MongoDb\Core\CollectionOptions.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\AbstractMongoConverter.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\Converters\BigIntegerToObjectIdConverter.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\Converters\BigIntegerToStringConverter.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\Converters\ObjectIdToBigIntegerConverter.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\Converters\ObjectIdToStringConverter.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\Converters\StringToBigIntegerConverter.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\Converters\StringToObjectIdConverter.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\Converters\StringToUriConverter.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\Converters\UriToStringConverter.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\CustomConversions.cs" />
     <Compile Include="Data\MongoDb\Core\Convert\IMongoConverter.cs" />
+    <Compile Include="Data\MongoDb\Core\Convert\MappingMongoConverter.cs" />
     <Compile Include="Data\MongoDb\Core\Convert\QueryMapper.cs" />
     <Compile Include="Data\MongoDb\Core\FindAndModifyOptions.cs" />
     <Compile Include="Data\MongoDb\Core\Geo\Distance.cs" />
     <Compile Include="Data\MongoDb\Core\Geo\IMetric.cs" />
     <Compile Include="Data\MongoDb\Core\Geo\Metrics.cs" />
+    <Compile Include="Data\MongoDb\Core\Index\GeoSpatialIndexedAttribute.cs" />
     <Compile Include="Data\MongoDb\Core\Mapping\Annotation\DBRefAttribute.cs" />
     <Compile Include="Data\MongoDb\Core\Mapping\Annotation\DocumentAttribute.cs" />
     <Compile Include="Data\MongoDb\Core\Mapping\Annotation\FieldAttribute.cs" />
@@ -85,8 +98,6 @@
     <Compile Include="Data\MongoDb\Core\Convert\IMongoReader.cs" />
     <Compile Include="Data\MongoDb\Core\Convert\IMongoWriter.cs" />
     <Compile Include="Data\MongoDb\Core\DbHolder.cs" />
-    <Compile Include="Data\MongoDb\Core\ICollectionCallback.cs" />
-    <Compile Include="Data\MongoDb\Core\IDatabaseCallback.cs" />
     <Compile Include="Data\MongoDb\Core\IDocumentCallbackHandler.cs" />
     <Compile Include="Data\MongoDb\Core\IIndexOperations.cs" />
     <Compile Include="Data\MongoDb\Core\IMongoOperations.cs" />

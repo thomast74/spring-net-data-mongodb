@@ -13,6 +13,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
@@ -74,44 +75,44 @@ namespace Spring.Data.MongoDb.Core
 	    void ExecuteQuery(Q.Query query, IDocumentCallbackHandler dch, string collectionName);
 
         /// <summary>
-        /// Executes a <see cref="IDatabaseCallback{T}"/> translating any exceptions as necessary.
+        /// Executes the given callback action, translating any exceptions as necessary.
         /// <p />
         /// Allows for returning a result object, that is a domain object or a collection of domain objects.
         /// </summary>
-        /// <param name="action">callback object that specifies the MongoDB actions to perform on the passed
+        /// <param name="databaseCallback">callback object that specifies the MongoDB actions to perform on the passed
         /// in DB instance.</param>
         /// <returns>a result object returned by the action or <code>null</code></returns>
-        T Execute<T>(IDatabaseCallback<T> action);
+        T Execute<T>(Func<MongoDatabase, T> databaseCallback);
 
 	    /// <summary>
-	    /// Executes the given <see cref="ICollectionCallback{T}"/> on the entity collection of the specified class.
+	    /// Executes the given callback action on the entity collection of the specified class.
 	    /// <p />
 	    /// Allows for returning a result object, that is a domain object or a collection of domain objects.
 	    /// </summary>
-	    /// <param name="action">callback object that specifies the MongoDB action</param>
+        /// <param name="collectionCallback">callback object that specifies the MongoDB action</param>
 	    /// <returns></returns> a result object returned by the action or <tt>null</tt>
-	    T Execute<T>(ICollectionCallback<T> action);
+        T Execute<T>(Func<MongoCollection, T> collectionCallback);
 
 	    /// <summary>
-	    /// Executes the given <see cref="ICollectionCallback{T}"/> on the collection of the given name.
+	    /// Executes the given callback action on the collection of the given name.
 	    /// <p />
 	    /// Allows for returning a result object, that is a domain object or a collection of domain objects.
 	    /// </summary>
-	    /// <param name="action">callback object that specifies the MongoDB action the callback action.</param>
         /// <param name="collectionName">the name of the collection that specifies which DBCollection instance 
+        /// <param name="collectionCallback">callback object that specifies the MongoDatabase action the callback action.</param>
         /// will be passed into</param>
         /// <returns>a result object returned by the action or <code>null</code></returns>
-        T Execute<T>(ICollectionCallback<T> action, string collectionName);
+        T Execute<T>(string collectionName, Func<MongoCollection, T> collectionCallback);
 
 	    /// <summary>
-        /// Executes the given <see cref="IDatabaseCallback{T}"/> within the same connection to the database so as to ensure 
+        /// Executes the given callback within the same connection to the database so as to ensure 
 	    /// consistency in a write heavy environment where you may read the data that you wrote.
 	    /// <p />
 	    /// Allows for returning a result object, that is a domain object or a collection of domain objects.
 	    /// </summary>
 	    /// <param name="action">callback that specified the MongoDB actions to perform on the DB instance</param>
 	    /// <returns>a result object returned by the action or <code>null</code></returns>
-        T ExecuteInSession<T>(IDatabaseCallback<T> action);
+        T ExecuteInSession<T>(Func<MongoDatabase, T> databaseCallback);
 
 	    /// <summary>
 	    /// Create an uncapped collection with a name based on the provided entity type.

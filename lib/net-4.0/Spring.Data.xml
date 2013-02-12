@@ -9644,7 +9644,7 @@
             <param name="customSimpleTypes">must not be <code>null</code></param>
             <param name="registerDefaults"><code>true</code> to register default types defined in <see cref="F:Spring.Data.Mapping.Model.SimpleTypeHolder.Defaults"/></param>
         </member>
-        <member name="M:Spring.Data.Mapping.Model.SimpleTypeHolder.#ctor(Spring.Collections.Generic.Set{System.Type},Spring.Data.Mapping.Model.SimpleTypeHolder)">
+        <member name="M:Spring.Data.Mapping.Model.SimpleTypeHolder.#ctor(Spring.Collections.Generic.ISet{System.Type},Spring.Data.Mapping.Model.SimpleTypeHolder)">
             <summary>
             Copy constructor to create a new <see cref="T:Spring.Data.Mapping.Model.SimpleTypeHolder"/> that carries the given additional custom simple types.
             </summary>
@@ -13665,6 +13665,208 @@
             <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
             <exception cref="T:System.ArgumentNullException">The <paramref name="info"/> parameter is <see langword="null"/>.</exception>
             <exception cref="T:System.Runtime.Serialization.SerializationException">The class name is <see langword="null"/> or <see cref="P:System.Exception.HResult"/> is zero (0).</exception>
+        </member>
+        <member name="T:Spring.Data.Convert.IEntityInstantiator">
+            <summary>
+            SPI to abstract strategies to create instances for <see cref="T:Spring.Data.Mapping.IPersistentEntity"/>s
+            </summary>
+            <author>Oliver Gierke</author>
+            <author>Thomas Trageser</author>
+        </member>
+        <member name="T:Spring.Data.Convert.EntityInstantiators">
+            <summary>
+            Simple value object allowing access to <see cref="T:Spring.Data.Convert.IEntityInstantiator"/> instances for a given type 
+            falling back to a default one.
+            </summary>
+            <author>Oliver Gierke</author>
+            <author>Thomas Trageser</author>
+        </member>
+        <member name="M:Spring.Data.Convert.EntityInstantiators.#ctor">
+            <summary>
+            Creates a new <see cref="T:Spring.Data.Convert.IEntityInstantiator"/> using the default fallback instantiator and no
+            custom ones.
+            </summary>
+        </member>
+        <member name="M:Spring.Data.Convert.EntityInstantiators.#ctor(Spring.Data.Convert.IEntityInstantiator)">
+            <summary>
+            Creates a new {@link EntityInstantiators} using the given {@link EntityInstantiator} as fallback.
+            </summary>
+            <param name="fallback">must not be <code>null</code></param>
+        </member>
+        <member name="M:Spring.Data.Convert.EntityInstantiators.#ctor(System.Collections.Generic.IDictionary{System.Type,Spring.Data.Convert.IEntityInstantiator})">
+            <summary>
+            Creates a new <see cref="T:Spring.Data.Convert.EntityInstantiators"/> using the default fallback instantiator and the given 
+            custom ones.
+            </summary>
+            <param name="customInstantiators">must not be <code>null</code></param>
+        </member>
+        <member name="M:Spring.Data.Convert.EntityInstantiators.#ctor(Spring.Data.Convert.IEntityInstantiator,System.Collections.Generic.IDictionary{System.Type,Spring.Data.Convert.IEntityInstantiator})">
+            <summary>
+            Creates a new {@link EntityInstantiator} using the given fallback {@link EntityInstantiator} and the given custom
+            ones.
+            </summary>
+            <param name="defaultInstantiator">must not be <code>null</code></param>
+            <param name="customInstantiators">must not be <code>null</code></param>
+        </member>
+        <member name="M:Spring.Data.Convert.EntityInstantiators.GetInstantiatorFor(Spring.Data.Mapping.IPersistentEntity)">
+            <summary>
+            Returns the {@link EntityInstantiator} to be used to create the given {@link PersistentEntity}.
+            </summary>
+            <param name="entity">mus not be <code>null</code></param>
+            <returns>
+            will never be <code>null</code>
+            </returns>
+        </member>
+        <member name="T:Spring.Data.Convert.ReflectionEntityInstantiator">
+            <summary>
+            <see cref="T:Spring.Data.Convert.IEntityInstantiator"/> that uses the <see cref="T:Spring.Data.Mapping.IPersistentEntity"/>'s 
+            <see cref="T:Spring.Data.Mapping.PreferredConstructor"/> to instantiate an  instance of the entity via reflection.
+            </summary>
+            <author>Oliver Gierke</author>
+            <author>Thomas Trageser</author>
+        </member>
+        <member name="T:Spring.Data.Mapping.Model.IParameterValueProvider">
+            <summary>
+            Callback interface to lookup values for a given <see cref="T:Spring.Data.Mapping.Parameter"/>.
+            </summary>
+            <author></author>
+            <author></author>
+        </member>
+        <member name="M:Spring.Data.Mapping.Model.IParameterValueProvider.GetParameterValue(Spring.Data.Mapping.Parameter)">
+            <summary>
+            Returns the value to be used for the given <see cref="T:Spring.Data.Mapping.Parameter"/> (usually when entity instances 
+            are created).
+            </summary>
+            <param name="parameter">must not be <code>null</code></param>
+        </member>
+        <member name="T:Spring.Data.Mapping.Model.MappingInstantiationException">
+            <summary>
+            Thrown in case of a Mapping issue
+            </summary>
+            <author>Jon Brisbin</author>
+            <author>Thomas Trageser</author>
+        </member>
+        <member name="M:Spring.Data.Mapping.Model.MappingInstantiationException.#ctor">
+            <summary>
+            Creates a new instance of the <see cref="T:Spring.Data.Mapping.Model.MappingInstantiationException"/> class.
+            </summary>
+        </member>
+        <member name="M:Spring.Data.Mapping.Model.MappingInstantiationException.#ctor(System.String)">
+            <summary>
+            Creates a new instance of the <see cref="T:Spring.Data.Mapping.Model.MappingInstantiationException"/> class.
+            </summary>
+            <param name="message">A message about the exception.</param>
+        </member>
+        <member name="M:Spring.Data.Mapping.Model.MappingInstantiationException.#ctor(System.String,System.Exception)">
+            <summary>
+            Creates a new instance of the <see cref="T:Spring.Data.Mapping.Model.MappingInstantiationException"/> class.
+            </summary>
+            <param name="message">A message about the exception.</param>
+            <param name="inner">The inner exception.</param>
+        </member>
+        <member name="M:Spring.Data.Mapping.Model.MappingInstantiationException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Creates a new instance of the <see cref="T:Spring.Data.Mapping.Model.MappingInstantiationException"/> class.
+            </summary>
+            <param name="info">
+            The <see cref="T:System.Runtime.Serialization.SerializationInfo"/>
+            that holds the serialized object data about the exception being thrown.
+            </param>
+            <param name="context">
+            The <see cref="T:System.Runtime.Serialization.StreamingContext"/>
+            that contains contextual information about the source or destination.
+            </param>
+        </member>
+        <member name="T:Spring.Data.Convert.ITypeInformationMapper">
+            <summary>
+            Interface to abstract the mapping from a type alias to the actual type.
+            </summary>
+            <author>Oliver Gierke</author>
+            <author>Thomas Trageser</author>
+        </member>
+        <member name="M:Spring.Data.Convert.ITypeInformationMapper.ResolveTypeFrom(System.Object)">
+            <summary>
+            Returns the actual <see cref="T:Spring.Data.Util.ITypeInformation"/> to be used for the given alias.
+            </summary>
+            <param name="alias">can be <code>null</code></param>
+        </member>
+        <member name="M:Spring.Data.Convert.ITypeInformationMapper.CreateAliasFor(Spring.Data.Util.ITypeInformation)">
+            <summary>
+            Returns the alias to be used for the given <see cref="T:Spring.Data.Util.ITypeInformation"/>.
+            </summary>
+            <param name="type">must not be <code>null</code></param>
+        </member>
+        <member name="T:Spring.Data.Convert.SimpleTypeInformationMapper">
+            <summary>
+            Basic <see cref="T:Spring.Data.Convert.ITypeInformationMapper"/> implementation that interprets the alias handles as fully 
+            qualified class name and tries to load a class with the given name to build <see cref="T:Spring.Data.Util.ITypeInformation"/>. 
+            Returns the fully qualified class name for alias creation.
+            </summary>
+            <author>Oliver Gierke</author>
+            <author>Thomas Trageser</author>
+        </member>
+        <member name="M:Spring.Data.Convert.SimpleTypeInformationMapper.ResolveTypeFrom(System.Object)">
+            <summary>
+            Returns the <see cref="T:Spring.Data.Util.ITypeInformation"/> that shall be used when the given <see cref="T:System.String"/> value is
+            found as type hint. The implementation will simply interpret the given value as fully-qualified type name
+            and try to load the type. Will return <code>null</code> in case the given <see cref="T:System.String"/> is empty.
+            </summary>
+            <param name="alias">the type to load, must not be <code>null</code>.</param>
+            <returns>
+            the type to be used for the given <see cref="T:System.String"/> representation or <code>null</code>{@literal null} 
+            if nothing found or the type cannot be loaded.
+            </returns>
+        </member>
+        <member name="M:Spring.Data.Convert.SimpleTypeInformationMapper.CreateAliasFor(Spring.Data.Util.ITypeInformation)">
+            <summary>
+            Turn the given type information into the String representation that shall be stored. Default implementation
+            simply returns the fully-qualified class name.
+            </summary>
+            <param name="type">must not be <code>null</code></param>
+            <returns>
+            The String representation to be stored or <code>null</code> if no type information shall be stored.
+            </returns>
+        </member>
+        <member name="T:Spring.Data.Convert.MappingContextTypeInformationMapper">
+            <summary>
+            <see cref="T:Spring.Data.Convert.ITypeInformationMapper"/> implementation that can be either set up using a <see cref="T:Spring.Data.Mapping.Context.IMappingContext"/>
+            or manually set up <see cref="T:System.Collections.Generic.Dictionary`2"/> of <see cref="T:System.String"/> aliases to types. If a 
+            <see cref="T:Spring.Data.Mapping.Context.IMappingContext"/> is used the <see cref="T:System.Collections.Generic.Dictionary`2"/> will be build inspecting the 
+            <see cref="T:Spring.Data.Mapping.IPersistentEntity"/> instances for type alias information.
+            </summary>
+            <author>Oliver Gierke</author>
+            <author>Thomas Trageser</author>
+        </member>
+        <member name="M:Spring.Data.Convert.MappingContextTypeInformationMapper.#ctor(Spring.Data.Mapping.Context.IMappingContext)">
+            <summary>
+            Creates a <see cref="T:Spring.Data.Convert.MappingContextTypeInformationMapper"/> from the given <see cref="T:Spring.Data.Mapping.Context.IMappingContext"/>.
+            Inspects all <see cref="T:Spring.Data.Mapping.IPersistentEntity"/> instances for alias information and builds a <see cref="T:System.Collections.Generic.Dictionary`2"/>
+            of aliases to types from it.
+            </summary>
+            <param name="mappingContext">must not be <code>null</code></param>
+        </member>
+        <member name="M:Spring.Data.Convert.MappingContextTypeInformationMapper.SafelyAddToCache(Spring.Data.Util.ITypeInformation,System.Object)">
+            <summary>
+            Adds the given alias to the cache in a {@literal null}-safe manner.
+            </summary>
+            <param name="key">must not be <code>null</code></param>
+            <param name="alias">can be <code>null</code></param>
+        </member>
+        <member name="T:Spring.Data.Convert.ConfigurableTypeInformationMapper">
+            <summary>
+            <see cref="T:Spring.Data.Convert.ITypeInformationMapper"/> implementation that can be either set up using a <see cref="T:Spring.Data.Mapping.Context.IMappingContext"/>
+            or manually set up <see cref="T:System.Collections.Generic.Dictionary`2"/> of <see cref="T:System.String"/> aliases to types. If a 
+            <see cref="T:Spring.Data.Mapping.Context.IMappingContext"/> is used the <see cref="T:System.Collections.Generic.Dictionary`2"/> will be build inspecting the 
+            <see cref="T:Spring.Data.Mapping.IPersistentEntity"/> instances for type alias information.
+            </summary>
+            <author>Oliver Gierke</author>
+            <author>Thomas Trageser</author>
+        </member>
+        <member name="M:Spring.Data.Convert.ConfigurableTypeInformationMapper.#ctor(System.Collections.Generic.IDictionary{System.Type,System.String})">
+            <summary>
+            Creates a new <see cref="T:Spring.Data.Convert.ConfigurableTypeInformationMapper"/> for the given type dictionary.
+            </summary>
+            <param name="sourceTypeMap">must not be <code>null</code>.</param>
         </member>
     </members>
 </doc>

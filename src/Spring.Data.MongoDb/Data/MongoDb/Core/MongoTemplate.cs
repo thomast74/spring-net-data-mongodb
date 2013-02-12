@@ -143,22 +143,22 @@ namespace Spring.Data.MongoDb.Core
             throw new NotImplementedException();
         }
 
-        public T Execute<T>(IDatabaseCallback<T> action)
+        public T Execute<T>(Func<MongoDatabase, T> databaseCallback)
         {
             throw new NotImplementedException();
         }
 
-        public T Execute<T>(ICollectionCallback<T> action)
+        public T Execute<T>(Func<MongoCollection, T> collectionCallback)
         {
             throw new NotImplementedException();
         }
 
-        public T Execute<T>(ICollectionCallback<T> action, string collectionName)
+        public T Execute<T>(string collectionName, Func<MongoCollection, T> collectionCallback)
         {
             throw new NotImplementedException();
         }
 
-        public T ExecuteInSession<T>(IDatabaseCallback<T> action)
+        public T ExecuteInSession<T>(Func<MongoDatabase, T> databaseCallback)
         {
             throw new NotImplementedException();
         }

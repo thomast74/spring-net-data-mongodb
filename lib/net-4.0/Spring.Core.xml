@@ -2478,14 +2478,11 @@
             If the specified method could not be found.
             </exception>
         </member>
-        <member name="M:Spring.Objects.Support.ArgumentConvertingMethodInvoker.RegisterCustomConverter(System.Type,System.ComponentModel.TypeConverter)">
+        <member name="M:Spring.Objects.Support.ArgumentConvertingMethodInvoker.RegisterCustomConverter(System.ComponentModel.TypeConverter)">
             <summary>
-            Register the given custom <see cref="T:System.ComponentModel.TypeConverter"/>
+            Register the given custom <see cref="T:Spring.Core.TypeConversion.ITypeConverter"/>
             for all properties of the given <see cref="T:System.Type"/>.
             </summary>
-            <param name="requiredType">
-            The <see cref="T:System.Type"/> of property.
-            </param>
             <param name="typeConverter">
             The <see cref="T:System.ComponentModel.TypeConverter"/> to register.
             </param>
@@ -3665,6 +3662,19 @@
             into <see cref="T:Microsoft.Win32.RegistryKey"/> instance.
             </summary>
             <author>Aleksandar Seovic</author>
+        </member>
+        <member name="T:Spring.Core.TypeConversion.AbstractTypeConverter`2">
+            <summary>
+            Abstract class for a TypeConverter to be used in <see cref="T:Spring.Core.TypeConversion.TypeConverterRegistry"/>.
+            </summary>
+            <author>Thomas Trageser</author>
+        </member>
+        <member name="T:Spring.Core.TypeConversion.ITypeConverter">
+            <summary>
+            Simpl einterface for <see cref="T:Spring.Core.TypeConversion.AbstractTypeConverter`2"/>
+            </summary>
+            <author>Thomas Trageser</author>
+            <author></author>
         </member>
         <member name="M:Spring.Core.TypeConversion.RegistryKeyConverter.CanConvertFrom(System.ComponentModel.ITypeDescriptorContext,System.Type)">
             <summary>
@@ -31110,7 +31120,7 @@
             If the alias is already in use.
             </exception>
         </member>
-        <member name="M:Spring.Objects.Factory.Config.IConfigurableObjectFactory.RegisterCustomConverter(System.Type,System.ComponentModel.TypeConverter)">
+        <member name="M:Spring.Objects.Factory.Config.IConfigurableObjectFactory.RegisterCustomConverter(System.ComponentModel.TypeConverter)">
             <summary>
             Register the given custom <see cref="T:System.ComponentModel.TypeConverter"/>
             for all properties of the given <see cref="T:System.Type"/>.
@@ -35979,13 +35989,13 @@
             the cache key for the item.
             </param>
         </member>
-        <member name="T:Spring.Core.TypeConversion.UniqueKeyConverter">
+        <member name="T:Spring.Core.TypeConversion.UniqueKeyConverter`1">
             <summary>
             Converts between instances of <see cref="T:Spring.Util.UniqueKey"/> and their string representations.
             </summary>
             <author>Erich Eichinger</author>
         </member>
-        <member name="M:Spring.Core.TypeConversion.UniqueKeyConverter.CanConvertFrom(System.ComponentModel.ITypeDescriptorContext,System.Type)">
+        <member name="M:Spring.Core.TypeConversion.UniqueKeyConverter`1.CanConvertFrom(System.ComponentModel.ITypeDescriptorContext,System.Type)">
             <summary>
             Can we convert from the sourcetype to a <see cref="T:Spring.Util.UniqueKey"/>?
             </summary>
@@ -36002,7 +36012,7 @@
             </param>
             <returns><see langword="true"/> if the conversion is possible.</returns>
         </member>
-        <member name="M:Spring.Core.TypeConversion.UniqueKeyConverter.ConvertFrom(System.ComponentModel.ITypeDescriptorContext,System.Globalization.CultureInfo,System.Object)">
+        <member name="M:Spring.Core.TypeConversion.UniqueKeyConverter`1.ConvertFrom(System.ComponentModel.ITypeDescriptorContext,System.Globalization.CultureInfo,System.Object)">
              <summary>
              Convert from a <see cref="T:System.String"/> value to an <see cref="T:Spring.Util.UniqueKey"/> instance.
              </summary>
@@ -36022,7 +36032,7 @@
              </returns>        
             <exception cref="T:System.NotSupportedException">The conversion cannot be performed. </exception>
         </member>
-        <member name="M:Spring.Core.TypeConversion.UniqueKeyConverter.CanConvertTo(System.ComponentModel.ITypeDescriptorContext,System.Type)">
+        <member name="M:Spring.Core.TypeConversion.UniqueKeyConverter`1.CanConvertTo(System.ComponentModel.ITypeDescriptorContext,System.Type)">
             <summary>
             Returns whether this converter can convert the object to the specified type, using the specified context.
             </summary>
@@ -36035,7 +36045,7 @@
              At the moment only conversion to string is supported.
              </remarks>
         </member>
-        <member name="M:Spring.Core.TypeConversion.UniqueKeyConverter.ConvertTo(System.ComponentModel.ITypeDescriptorContext,System.Globalization.CultureInfo,System.Object,System.Type)">
+        <member name="M:Spring.Core.TypeConversion.UniqueKeyConverter`1.ConvertTo(System.ComponentModel.ITypeDescriptorContext,System.Globalization.CultureInfo,System.Object,System.Type)">
             <summary>
             Converts the given value object to the specified type, using the specified context and culture information.
             </summary>
@@ -38821,7 +38831,7 @@
             pickup of the
             <see cref="T:Spring.Objects.Factory.Config.CustomConverterConfigurer"/>
             is performed (custom converters will have to be added manually using the
-            <see cref="M:Spring.Objects.Factory.Config.IConfigurableObjectFactory.RegisterCustomConverter(System.Type,System.ComponentModel.TypeConverter)"/>
+            <see cref="!:Spring.Objects.Factory.Config.IConfigurableObjectFactory.RegisterCustomConverter(Type, TypeConverter)"/>
             method). For <i>most</i> application scenarios, one will get better
             mileage using the <see cref="T:Spring.Context.IApplicationContext"/>
             abstraction.
@@ -38969,7 +38979,7 @@
             <author>Simon White (.NET)</author>
             <seealso cref="T:Spring.Objects.Factory.Config.IObjectFactoryPostProcessor"/>
             <seealso cref="T:Spring.Context.IApplicationContext"/>
-            <seealso cref="M:Spring.Objects.Factory.Config.IConfigurableObjectFactory.RegisterCustomConverter(System.Type,System.ComponentModel.TypeConverter)"/>
+            <seealso cref="!:Spring.Objects.Factory.Config.IConfigurableObjectFactory.RegisterCustomConverter(Type, TypeConverter)"/>
         </member>
         <member name="M:Spring.Objects.Factory.Config.CustomConverterConfigurer.PostProcessObjectFactory(Spring.Objects.Factory.Config.IConfigurableListableObjectFactory)">
             <summary>
@@ -38985,15 +38995,13 @@
         </member>
         <member name="M:Spring.Objects.Factory.Config.CustomConverterConfigurer.ResolveConverter(System.Object)">
             <summary>
-            Resolves the supplied <paramref name="value"/> into a
-            <see cref="T:System.ComponentModel.TypeConverter"/> instance.
+            Resolves the supplied <paramref name="value"/> into a <see cref="T:Spring.Core.TypeConversion.ITypeConverter"/> instance.
             </summary>
             <param name="value">
-            The object that is to be resolved into a
-            <see cref="T:System.ComponentModel.TypeConverter"/> instance.
+            The object that is to be resolved into a <see cref="T:System.ComponentModel.TypeConverter"/> instance.
             </param>
             <returns>
-            A resolved <see cref="T:System.ComponentModel.TypeConverter"/> instance.
+            A resolved <see cref="T:Spring.Core.TypeConversion.ITypeConverter"/> instance.
             </returns>
             <exception cref="T:Spring.Objects.ObjectsException">
             If the supplied <paramref name="value"/> is <see langword="null"/>,
@@ -41449,12 +41457,12 @@
             </summary>
             <seealso cref="M:Spring.Objects.Factory.Config.IConfigurableObjectFactory.RegisterAlias(System.String,System.String)"/>.
         </member>
-        <member name="M:Spring.Objects.Factory.Support.AbstractObjectFactory.RegisterCustomConverter(System.Type,System.ComponentModel.TypeConverter)">
+        <member name="M:Spring.Objects.Factory.Support.AbstractObjectFactory.RegisterCustomConverter(System.ComponentModel.TypeConverter)">
             <summary>
             Register the given custom <see cref="T:System.ComponentModel.TypeConverter"/>
             for all properties of the given <see cref="T:System.Type"/>.
             </summary>
-            <seealso cref="M:Spring.Objects.Factory.Config.IConfigurableObjectFactory.RegisterCustomConverter(System.Type,System.ComponentModel.TypeConverter)"/>.
+            <seealso cref="M:Spring.Objects.Factory.Config.IConfigurableObjectFactory.RegisterCustomConverter(System.ComponentModel.TypeConverter)"/>.
         </member>
         <member name="M:Spring.Objects.Factory.Support.AbstractObjectFactory.RegisterSingleton(System.String,System.Object)">
             <summary>
@@ -46473,7 +46481,7 @@
             A <see cref="T:System.IO.Stream"/> if successful. 
             </returns>
         </member>
-        <member name="T:Spring.Core.TypeConversion.CredentialConverter">
+        <member name="T:Spring.Core.TypeConversion.CredentialConverter`1">
             <summary>
             Converts string representation of a credential for Web client authentication 
             into an instance of <see cref="T:System.Net.NetworkCredential"/>.
@@ -46492,7 +46500,7 @@
             </example>
             <author>Bruno Baia</author>
         </member>
-        <member name="M:Spring.Core.TypeConversion.CredentialConverter.CanConvertFrom(System.ComponentModel.ITypeDescriptorContext,System.Type)">
+        <member name="M:Spring.Core.TypeConversion.CredentialConverter`1.CanConvertFrom(System.ComponentModel.ITypeDescriptorContext,System.Type)">
             <summary>
             Can we convert from the sourcetype 
             to a <see cref="T:System.Net.NetworkCredential"/> instance ?
@@ -46512,7 +46520,7 @@
             </param>
             <returns><see langword="true"/> if the conversion is possible.</returns>
         </member>
-        <member name="M:Spring.Core.TypeConversion.CredentialConverter.ConvertFrom(System.ComponentModel.ITypeDescriptorContext,System.Globalization.CultureInfo,System.Object)">
+        <member name="M:Spring.Core.TypeConversion.CredentialConverter`1.ConvertFrom(System.ComponentModel.ITypeDescriptorContext,System.Globalization.CultureInfo,System.Object)">
             <summary>
             Convert from a <see cref="T:System.String"/> value to an
             <see cref="T:System.Net.NetworkCredential"/> instance.
@@ -50198,23 +50206,80 @@
             Registers standard and configured type converters.
             </summary>
         </member>
-        <member name="M:Spring.Core.TypeConversion.TypeConverterRegistry.GetConverter(System.Type)">
+        <member name="M:Spring.Core.TypeConversion.TypeConverterRegistry.GetConverter(System.Type,System.Type)">
+            <summary>
+            Returns <see cref="T:Spring.Core.TypeConversion.ITypeConverter"/> for the specified type.
+            </summary>
+            <param name="sourceType">convert from the given type, must not be <code>null</code></param>
+            <param name="targetType">convert to the given type, must not be <code>null</code></param>
+            <returns>a type converter for the specified type.</returns>
+        </member>
+        <member name="M:Spring.Core.TypeConversion.TypeConverterRegistry.GetConverter``2">
             <summary>
             Returns <see cref="T:System.ComponentModel.TypeConverter"/> for the specified type.
             </summary>
-            <param name="type">Type to get the converter for.</param>
             <returns>a type converter for the specified type.</returns>
-            <exception cref="T:System.ArgumentNullException">If <paramref name="type"/> is <c>null</c>.</exception>
         </member>
-        <member name="M:Spring.Core.TypeConversion.TypeConverterRegistry.RegisterConverter(System.Type,System.ComponentModel.TypeConverter)">
+        <member name="M:Spring.Core.TypeConversion.TypeConverterRegistry.GetConvertersTo``1">
+            <summary>
+            Get all converters that are registered to convert to TTargetType
+            </summary>
+            <typeparam name="TTargetType" />
+            <returns></returns>
+        </member>
+        <member name="M:Spring.Core.TypeConversion.TypeConverterRegistry.GetConvertersTo(System.Type)">
+            <summary>
+            Get all converters that are registered to convert to expectedTargetType
+            </summary>
+            <param name="expectedTargetType">must not be <code>null</code></param>
+            <returns></returns>
+        </member>
+        <member name="M:Spring.Core.TypeConversion.TypeConverterRegistry.GetConvertersFrom``1">
+            <summary>
+            Get all converters that are registered to convert from TSourceType
+            </summary>
+            <typeparam name="TSourceType" />
+            <returns></returns>
+        </member>
+        <member name="M:Spring.Core.TypeConversion.TypeConverterRegistry.GetConvertersFrom(System.Type)">
+            <summary>
+            Get all converters that are registered to convert from sourceType
+            </summary>
+            <param name="sourceType">must not be <code>null</code></param>
+            <returns></returns>
+        </member>
+        <member name="M:Spring.Core.TypeConversion.TypeConverterRegistry.CanConvert(System.Type,System.Type)">
+            <summary>
+            Returns wether the current TypeConverterRegistery has a converter that can convert the sourceType
+            into the targetType
+            </summary>
+            <param name="sourceType">the source Type of the value</param>
+            <param name="targetType">the target Type to convert to</param>
+            <returns>
+            <code>true</code> if there is a converter tho convert the source type into the target type,
+            otherwise it returns <code>false</code>
+            </returns>
+        </member>
+        <member name="M:Spring.Core.TypeConversion.TypeConverterRegistry.CanConvert``2">
+            <summary>
+            Returns wether the current TypeConverterRegistery has a converter that can convert the sourceType
+            into the targetType
+            </summary>
+            <typeparam name="TSourceType">the source Type of the value</typeparam>
+            <typeparam name="TTargetType">the target Type to convert to</typeparam>
+            <returns>
+            <code>true</code> if there is a converter tho convert the source type into the target type,
+            otherwise it returns <code>false</code>
+            </returns>
+        </member>
+        <member name="M:Spring.Core.TypeConversion.TypeConverterRegistry.RegisterConverter(System.ComponentModel.TypeConverter)">
             <summary>
             Registers <see cref="T:System.ComponentModel.TypeConverter"/> for the specified type.
             </summary>
-            <param name="type">Type to register the converter for.</param>
             <param name="converter">Type converter to register.</param>
             <exception cref="T:System.ArgumentNullException">If either of arguments is <c>null</c>.</exception>
         </member>
-        <member name="M:Spring.Core.TypeConversion.TypeConverterRegistry.RegisterConverter(System.String,System.String)">
+        <member name="M:Spring.Core.TypeConversion.TypeConverterRegistry.RegisterConverter(System.String)">
             <summary>
             Registers <see cref="T:System.ComponentModel.TypeConverter"/> for the specified type.
             </summary>
@@ -50223,9 +50288,8 @@
             type to register converter for and the converter itself,
             resolves them using <see cref="T:Spring.Core.TypeResolution.TypeRegistry"/>, creates an
             instance of type converter and calls overloaded
-            <see cref="M:Spring.Core.TypeConversion.TypeConverterRegistry.RegisterConverter(System.Type,System.ComponentModel.TypeConverter)"/> method.
+            <see cref="M:Spring.Core.TypeConversion.TypeConverterRegistry.RegisterConverter(System.ComponentModel.TypeConverter)"/> method.
             </remarks>
-            <param name="typeName">Type name of the type to register the converter for (can be a type alias).</param>
             <param name="converterTypeName">Type name of the type converter to register (can be a type alias).</param>
             <exception cref="T:System.ArgumentNullException">If either of arguments is <c>null</c> or empty string.</exception>
             <exception cref="T:System.TypeLoadException">

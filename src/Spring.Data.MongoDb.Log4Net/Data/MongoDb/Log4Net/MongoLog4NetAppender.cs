@@ -203,7 +203,7 @@ namespace Spring.Data.MongoDb.Log4Net
                 if (_db != null)
                     return;
 
-                _mongo = MongoServer.Create(ConnectionString);
+                _mongo = new MongoClient(ConnectionString).GetServer();
                 _db = _mongo.GetDatabase(string.IsNullOrEmpty(Database) ? "log4net" : Database);
             }
             catch (Exception e)

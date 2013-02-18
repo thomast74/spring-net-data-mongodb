@@ -34,7 +34,7 @@ namespace Spring.Data.MongoDb.Log4Net
     [Category(TestCategory.Integration)]
     public class MongoLog4NetAppenderTest
     {
-        private readonly string _connectionString = "mongodb://localhost/?safe=true";
+        private readonly string _url = "mongodb://localhost/?safe=true";
         private readonly string _databaseName = MongoLog4NetAppender.DefaultDatabaseName;
         private readonly string _collectionName = MongoLog4NetAppender.DefaultCollectionName;
 
@@ -44,7 +44,7 @@ namespace Spring.Data.MongoDb.Log4Net
         [SetUp]
         public void Setup()
         {
-            _mongo = MongoServer.Create(_connectionString);
+            _mongo = MongoServer.Create(_url);
             _db = _mongo.GetDatabase(_databaseName);
             _db.GetCollection(_collectionName).Drop();
         }
@@ -55,7 +55,7 @@ namespace Spring.Data.MongoDb.Log4Net
             XmlConfigurator.Configure(new MemoryStream(Encoding.UTF8.GetBytes(@"
                 <log4net>
 	                <appender name='mongo' type='Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender, Spring.Data.MongoDb.Log4Net'>
-		                <connectionString value='mongodb://localhost' />
+		                <url value='mongodb://localhost' />
 		                <parameter>
 			                <parameterName value='timestamp' />
 			                <layout type='log4net.Layout.RawTimeStampLayout' />
@@ -78,7 +78,7 @@ namespace Spring.Data.MongoDb.Log4Net
             XmlConfigurator.Configure(new MemoryStream(Encoding.UTF8.GetBytes(@"
                 <log4net>
 	                <appender name='mongo' type='Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender, Spring.Data.MongoDb.Log4Net'>
-		                <connectionString value='mongodb://localhost' />
+		                <url value='mongodb://localhost' />
                         <parameter>
                           <parameterName value='level' />
                           <layout type='log4net.Layout.PatternLayout' value='%level' />
@@ -101,7 +101,7 @@ namespace Spring.Data.MongoDb.Log4Net
             XmlConfigurator.Configure(new MemoryStream(Encoding.UTF8.GetBytes(@"
                 <log4net>
 	                <appender name='mongo' type='Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender, Spring.Data.MongoDb.Log4Net'>
-		                <connectionString value='mongodb://localhost' />
+		                <url value='mongodb://localhost' />
 		                <parameter>
 			                <parameterName value='thread' />
 			                <layout type='log4net.Layout.PatternLayout' value='%thread' />
@@ -124,7 +124,7 @@ namespace Spring.Data.MongoDb.Log4Net
             XmlConfigurator.Configure(new MemoryStream(Encoding.UTF8.GetBytes(@"
                 <log4net>
 	                <appender name='mongo' type='Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender, Spring.Data.MongoDb.Log4Net'>
-		                <connectionString value='mongodb://localhost' />
+		                <url value='mongodb://localhost' />
 		                <parameter>
 			                <parameterName value='exception' />
 			                <layout type='log4net.Layout.ExceptionLayout' />
@@ -154,7 +154,7 @@ namespace Spring.Data.MongoDb.Log4Net
             XmlConfigurator.Configure(new MemoryStream(Encoding.UTF8.GetBytes(@"
                 <log4net>
 	                <appender name='mongo' type='Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender, Spring.Data.MongoDb.Log4Net'>
-		                <connectionString value='mongodb://localhost' />
+		                <url value='mongodb://localhost' />
 		                <parameter>
 			                <parameterName value='contextProperty' />
 			                <layout type='log4net.Layout.RawPropertyLayout'>
@@ -180,7 +180,7 @@ namespace Spring.Data.MongoDb.Log4Net
             XmlConfigurator.Configure(new MemoryStream(Encoding.UTF8.GetBytes(@"
                 <log4net>
 	                <appender name='mongo' type='Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender, Spring.Data.MongoDb.Log4Net'>
-		                <connectionString value='mongodb://localhost' />
+		                <url value='mongodb://localhost' />
 		                <parameter>
 			                <parameterName value='contextProperty' />
 			                <layout type='log4net.Layout.RawPropertyLayout'>
@@ -206,7 +206,7 @@ namespace Spring.Data.MongoDb.Log4Net
             XmlConfigurator.Configure(new MemoryStream(Encoding.UTF8.GetBytes(@"
                 <log4net>
 	                <appender name='mongo' type='Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender, Spring.Data.MongoDb.Log4Net'>
-		                <connectionString value='mongodb://localhost' />
+		                <url value='mongodb://localhost' />
                     </appender>
 	                <root><level value='ALL' /><appender-ref ref='mongo' /></root></log4net>
                 ")));
@@ -257,7 +257,7 @@ namespace Spring.Data.MongoDb.Log4Net
             XmlConfigurator.Configure(new MemoryStream(Encoding.UTF8.GetBytes(@"
                 <log4net>
                   <appender name='mongo' type='Spring.Data.MongoDb.Log4Net.MongoLog4NetAppender, Spring.Data.MongoDb.Log4Net'>
-                    <connectionString value='mongodb://localhost/?safe=true' />
+                    <url value='mongodb://localhost/?safe=true' />
                     <collectionPattern value='%X{applicationId}%X{year}%X{month}' />
                     <applicationId value='myApp' />
                   </appender>

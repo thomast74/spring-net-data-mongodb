@@ -75,7 +75,7 @@ namespace Spring.Data.MongoDb.Log4Net
         /// 
         /// If no database specified <see cref="DefaultDatabaseName"/>
         /// </summary>
-        public virtual string ConnectionString { get; set; }
+        public virtual string Url { get; set; }
         /// <summary>
         /// Defined the database name to use for logging informaiton to a mongoDB server
         /// </summary>
@@ -203,7 +203,7 @@ namespace Spring.Data.MongoDb.Log4Net
                 if (_db != null)
                     return;
 
-                _mongo = new MongoClient(ConnectionString).GetServer();
+                _mongo = new MongoClient(Url).GetServer();
                 _db = _mongo.GetDatabase(string.IsNullOrEmpty(Database) ? "log4net" : Database);
             }
             catch (Exception e)

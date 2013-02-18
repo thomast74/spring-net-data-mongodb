@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Common.Logging">
+      <HintPath>..\..\packages\Common.Logging.2.1.2\lib\net40\Common.Logging.dll</HintPath>
+    </Reference>
     <Reference Include="MongoDB.Bson, Version=1.7.0.4714, Culture=neutral, PublicKeyToken=f686731cfb9cc103, processorArchitecture=MSIL">
       <HintPath>..\..\packages\mongocsharpdriver.1.7\lib\net35\MongoDB.Bson.dll</HintPath>
     </Reference>
@@ -43,18 +46,48 @@
     <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="Spring.Aop">
+      <HintPath>..\..\packages\Spring.Aop.2.0.0-M2\lib\net40\Spring.Aop.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Core">
+      <HintPath>..\..\packages\Spring.Core.2.0.0-M2\lib\net40\Spring.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Data">
+      <HintPath>..\..\packages\Spring.Data.2.0.0-M2\lib\net40\Spring.Data.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\src\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Data\MongoDb\Config\MongoDatabaseFactoryParserTests.cs" />
+    <Compile Include="Data\MongoDb\Config\MongoNamespaceParserTests.cs" />
+    <Compile Include="Data\MongoDb\Config\MongoFactoryParserTests.cs" />
+    <Compile Include="Data\MongoDb\Config\ReadOnlyXmlTestResource.cs" />
+    <Compile Include="Data\MongoDb\Core\MongoDbUtilsTests.cs" />
+    <Compile Include="Data\MongoDb\Core\MongoFactoryObjectTests.cs" />
+    <Compile Include="Data\MongoDb\Core\SimpleMongoDbFactoryTests.cs" />
+    <Compile Include="Data\MongoDb\MongoDatabaseTestHelper.cs" />
+    <Compile Include="Data\MongoDb\MongoServerTestHelper.cs" />
+    <Compile Include="Data\MongoDb\MongoTestHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestCategory.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Spring.Data.MongoDb\Spring.Data.MongoDb.csproj">
+      <Project>{AB4EF60C-1EB0-403D-9BCA-E14F05201B80}</Project>
+      <Name>Spring.Data.MongoDb</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

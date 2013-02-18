@@ -1,0 +1,420 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns="http://www.springframework.net/mongo"
+		        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+		        xmlns:objects="http://www.springframework.net"
+		        xmlns:tool="http://www.springframework.net/tool"
+		        targetNamespace="http://www.springframework.net/mongo"
+		        elementFormDefault="qualified"
+		        attributeFormDefault="unqualified">
+
+  <xsd:import namespace="http://www.springframework.net"/>
+  <xsd:import namespace="http://www.springframework.net/context"/>
+  <xsd:import namespace="http://www.springframework.net/tool"/>
+
+  <xsd:element name="mongo" type="mongoType">
+    <xsd:annotation>
+      <xsd:documentation>
+        <![CDATA[
+        Defines a MongoServer instance used for accessing a MongoDB Server.
+			  ]]>
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+
+  <xsd:element name="db-factory">
+    <xsd:annotation>
+      <xsd:documentation>
+        <![CDATA[
+        Defines a MongoDatabaseFactory for connecting to a specific database
+			  ]]>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:attribute name="id" type="xsd:ID" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            The name of the mongo definition (by default "MongoDatabaseFactory").
+            ]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="mongo-ref" type="xsd:string" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            The reference to a Mongo instance. If not configured a default com.mongodb.Mongo instance will be created.
+					  ]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="dbname" type="xsd:string" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            The name of the database to connect to. Default is 'db'.
+						]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="port" type="xsd:string" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            The port to connect to MongoDB server. Default is 27017.
+            Only used if not using a Mongo reference.
+						]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="host" type="xsd:string" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            The host to connect to a MongoDB server. Default is localhost
+            Only used if not using a Mongo reference.
+					  ]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="username" type="xsd:string" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            The username to use when connecting to a MongoDB server.            
+						]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="password" type="xsd:string" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            The password to use when connecting to a MongoDB server.
+						]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="url" type="xsd:string" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            The MongoDB url string to connect to a MongoServer. Used in preference before mongo-ref.
+            ]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="write-concern">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            The WriteConcern that will be the default value used when asking the MongoDatabaseFactory for a DB object.
+            ]]>
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleType>
+          <xsd:union memberTypes="writeConcernEnumeration xsd:string"/>
+        </xsd:simpleType>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:complexType name="mongoType">
+    <xsd:sequence minOccurs="0" maxOccurs="1">
+      <xsd:element name="settings" type="settingsType">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            The Mongo Client Settings options
+						]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="id" type="xsd:ID" use="optional">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          The name of the mongo definition (by default "mongo").
+          ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="url" type="xsd:string" use="optional">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          MongoDB url string to connect to a MongoServer
+					]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="replica-set" type="xsd:string" use="optional">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          The comma delimited list of host:port entries to use for replica set/pairs.
+					]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="write-concern">
+      <xsd:annotation>
+        <xsd:documentation>
+          The WriteConcern that will be the default value used when asking the MongoDbFactory for a DB object
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:union memberTypes="writeConcernEnumeration xsd:string"/>
+      </xsd:simpleType>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="settingsType">
+    <xsd:attribute name="connect-timeout" type="timeSpan">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          Sets the connect timeout of the connection to a MongoDB server
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="connection-mode">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          ConnectionMode: Automatic, Direct, ReplicaSet, ShardRouter
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:union memberTypes="connectionModeEnumeration xsd:string"/>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="username" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          Username used while creation MongoDefaultCredentials
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="password" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          Password used while creating MongoDefaultCredentials
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="guid-representation">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          Guid Representation: Unspecified, Standard, CSharpLegacy, JavaLegacy, PythonLegacy
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:union memberTypes="guidRepresentationEnumeration xsd:string" />
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="ipv6" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          Use IPv6 for connection? true/false
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="max-connection-idle-time" type="timeSpan">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          Set the max connection idle time before closing connection
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="max-connection-life-time" type="timeSpan">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="max-connection-pool-size" type="xsd:int">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="min-connection-pool-size" type="xsd:int">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="read-preference">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          This controls if the driver is allowed to read from secondaries or slaves. Defaults to false.
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:union memberTypes="readPreferenceEnumeration xsd:string"/>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="replica-set-name" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="secondary-acceptable-latency" type="timeSpan">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="server" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          The MongoDb Server to connect to  [Hostname]:[Port]
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="servers" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          The MongoDb Servers to connect to  [Hostname1]:[Port],[Hostname2]:[Port]
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="socket-timeout" type="timeSpan">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="use-ssl" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          Wether to use SSL to connect to MongoDb Server
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+
+    <xsd:attribute name="verify-ssl-certificate" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          Wether to verify the ssls certifcate used to connecto the MongoDb Server
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="wait-queue-size" type="xsd:int">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="wait-queue-timeout" type="timeSpan">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="write-concern">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          The WriteConcern that will be the default value used when asking the MongoDbFactory for a DB object
+				  ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:union memberTypes="writeConcernEnumeration" />
+      </xsd:simpleType>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:simpleType name="timeSpan">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="[0-9][0-9]:[0-9][0-9]:[0-9][0-9]"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="writeConcernEnumeration">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="Acknowledge" />
+      <xsd:enumeration value="None" />
+      <xsd:enumeration value="Unacknowledge" />
+      <xsd:enumeration value="Journaled" />
+      <xsd:enumeration value="FSynced" />
+      <xsd:enumeration value="Normal" />
+      <xsd:enumeration value="WMajority" />
+      <xsd:enumeration value="W2" />
+      <xsd:enumeration value="W3" />
+      <xsd:enumeration value="W4" />
+    </xsd:restriction>
+  </xsd:simpleType>
+  
+  <xsd:simpleType name="connectionModeEnumeration">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="Automatic" />
+      <xsd:enumeration value="Direct" />
+      <xsd:enumeration value="ReplicatSet" />
+      <xsd:enumeration value="ShardRouter" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="guidRepresentationEnumeration">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="Unspecified" />
+      <xsd:enumeration value="Standard" />
+      <xsd:enumeration value="CSharpLegacy" />
+      <xsd:enumeration value="JavaLegacy" />
+      <xsd:enumeration value="PythonLegacy" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="readPreferenceEnumeration">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="Nearest" />
+      <xsd:enumeration value="Primary" />
+      <xsd:enumeration value="PrimaryPreferred" />
+      <xsd:enumeration value="Secondary" />
+      <xsd:enumeration value="SecondaryPreferred" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+</xsd:schema>

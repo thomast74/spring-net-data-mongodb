@@ -119,6 +119,109 @@
     </xsd:complexType>
   </xsd:element>
 
+  <xsd:element name="convention-profile">
+    <xsd:annotation>
+      <xsd:documentation>
+        <![CDATA[
+        Defines a MongoServer instance used for accessing a MongoDB Server.
+			  ]]>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:attribute name="id" type="xsd:ID" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            The name of the mongo definition (by default "MongoConventionProfile").
+            ]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="default-value" type="nonNullString" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            ]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="element-name" type="nonNullString" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            ]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="extra-elements-member" type="nonNullString" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            ]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="id-generator" type="nonNullString" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            ]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="id-member" type="nonNullString" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            ]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="ignore-extra-elements" type="nonNullString" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            ]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="ignore-if-default" type="nonNullString" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            ]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="ignore-if-null" type="nonNullString" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            ]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="member-finder" type="nonNullString" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            ]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="serialization-options" type="nonNullString" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[
+            ]]>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+
+    </xsd:complexType>
+  </xsd:element>
+
+
   <xsd:complexType name="mongoType">
     <xsd:sequence minOccurs="0" maxOccurs="1">
       <xsd:element name="settings" type="settingsType">
@@ -414,6 +517,15 @@
       <xsd:enumeration value="PrimaryPreferred" />
       <xsd:enumeration value="Secondary" />
       <xsd:enumeration value="SecondaryPreferred" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="nonNullString">
+    <xsd:annotation>
+      <xsd:documentation>Defines a base type for any required string.  Defines a string with a minimum length of 0</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="0"/>
     </xsd:restriction>
   </xsd:simpleType>
 

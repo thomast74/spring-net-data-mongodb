@@ -29,6 +29,7 @@ namespace Spring.Data.MongoDb.Config
         /// ****************************************
         public const string Mongo = "mongo";
         public const string DbFactory = "db-factory";
+        public const string ConventionProfile = "convention-profile";
 
         public const string MappingContext = "MappingContext";
         public const string IndexHelper = "IndexCreationHelper";
@@ -63,6 +64,24 @@ namespace Spring.Data.MongoDb.Config
         public const string MongoDatabaseFactoryDefaultHostname = "localhost";
         public const string MongoDatabaseFactoryDefaultPort = "27017";
 
+        /// ********************************************************
+        /// * Mongo ConventionProfile Factory Attribute and Elements
+        /// ********************************************************
+        public const string MongoConventionProfileId = "id";
+
+        public const string ConventionProfileDefaultValue = "default-value";
+        public const string ConventionProfileElementName = "element-name";
+        public const string ConventionProfileExtraElementsMember = "extra-elements-member";
+        public const string ConventionProfileIdGenerator = "id-generator";
+        public const string ConventionProfileIdMember = "id-member";
+        public const string ConventionProfileIgnoreExtraElements = "ignore-extra-elements";
+        public const string ConventionProfileIgnoreIfDefault = "ignore-if-default";
+        public const string ConventionProfileIgnoreIfNull = "ignore-if-null";
+        public const string ConventionProfileMemberFinder = "member-finder";
+        public const string ConventionProfileSerializationOptions = "serialization-options";
+        
+        public const string MongoConventionProfileDefaultId = "MongoConventionProfile";
+        
         /// ****************************************
         /// * Mongo Settings Object Attributes
         /// ****************************************

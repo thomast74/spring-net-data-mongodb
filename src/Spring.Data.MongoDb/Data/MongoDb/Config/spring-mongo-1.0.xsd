@@ -128,6 +128,26 @@
       </xsd:documentation>
     </xsd:annotation>
     <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="include-filter" type="filterType" minOccurs="0" maxOccurs="1">
+          <xsd:annotation>
+            <xsd:documentation>
+              <![CDATA[
+              Controls which eligible types to include for this convention profile
+							]]>
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="exclude-filter" type="filterType" minOccurs="0" maxOccurs="unbounded">
+          <xsd:annotation>
+            <xsd:documentation>
+              <![CDATA[
+	            Controls which eligible types to exclude for this convention profile
+						  ]]>
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+      </xsd:sequence>
       <xsd:attribute name="id" type="xsd:ID" use="optional">
         <xsd:annotation>
           <xsd:documentation>
@@ -217,7 +237,6 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:attribute>
-
     </xsd:complexType>
   </xsd:element>
 
@@ -519,6 +538,42 @@
       <xsd:enumeration value="SecondaryPreferred" />
     </xsd:restriction>
   </xsd:simpleType>
+
+  <xsd:complexType name="filterType">
+    <xsd:attribute name="type" use="required">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          Controls the type of filtering to apply to the expression.
+
+          "attribute" indicates an attribute to be present or excluded at the type level in target components;
+          "assignable" indicates a class (or interface) that the target components are assignable to (extend/implement);
+          "regex" indicates a regex expression to be matched by the target components' class names;
+
+          Note: This attribute will not be inherited by child bean definitions.
+          Hence, it needs to be specified per concrete bean definition.
+          ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="assignable" />
+          <xsd:enumeration value="attribute" />
+          <xsd:enumeration value="custom" />
+          <xsd:enumeration value="regex" />
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="expression" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          Indicates the filter expression, the type of which is indicated by "type".
+          ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
 
   <xsd:simpleType name="nonNullString">
     <xsd:annotation>

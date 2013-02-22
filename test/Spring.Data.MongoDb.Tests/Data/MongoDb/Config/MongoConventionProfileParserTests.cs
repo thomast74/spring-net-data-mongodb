@@ -17,7 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using MongoDB.Bson.Serialization;
@@ -30,10 +29,11 @@ using Spring.Objects.Factory.Xml;
 namespace Spring.Data.MongoDb.Config
 {
     /// <summary>
-    /// Unit test for <see cref="MongoConventionParserTests"/>
+    /// Unit test for <see cref="ConventionProfileParser"/>
     /// </summary>
     /// <author>Thomas Trageser</author>
     [TestFixture]
+    [Category(TestCategory.Unit)]
     public class MongoConventionProfileParserTests
     {
         [SetUp]
@@ -119,14 +119,57 @@ namespace Spring.Data.MongoDb.Config
         [Test]
         public void SetIncludeFilterCorrectly()
         {
-            Assert.Fail();            
+            string xml = @"<?xml version='1.0' encoding='UTF-8' ?>
+                            <objects xmlns='http://www.springframework.net' xmlns:mongo='http://www.springframework.net/mongo'>  
+                                <mongo:convention-profile id='Profile1'
+	                                default-value='Spring.Data.MongoDb.Config.DefaultValueConvention, Spring.Data.MongoDb.Tests'>
+                                    <mongo:include-filter type='regex' expression='.*Include' />
+                                </mongo:convention-profile>
+                            </objects>";
+            var factory = new XmlObjectFactory(new StringResource(xml, Encoding.UTF8));
+            var profile1 = factory.GetObject<ConventionProfile>("Profile1");
+
+            var lookupProfile = BsonClassMap.LookupConventions(typeof (MyEntityInclude));
+            
+            Assert.That(lookupProfile, Is.Not.Null);
+            Assert.That(lookupProfile, Is.EqualTo(profile1));
+
+            lookupProfile = BsonClassMap.LookupConventions(typeof(MyEntityExclude));
+            Assert.That(lookupProfile, Is.Not.SameAs(profile1));
+            Assert.That(lookupProfile.DefaultValueConvention, Is.Not.TypeOf<DefaultValueConvention>());
         }
 
         [Test]
         public void SetExcludeFiltersCorrectly()
         {
-            Assert.Fail();
+            string xml = @"<?xml version='1.0' encoding='UTF-8' ?>
+                            <objects xmlns='http://www.springframework.net' xmlns:mongo='http://www.springframework.net/mongo'>  
+                                <mongo:convention-profile id='Profile1'
+	                                default-value='Spring.Data.MongoDb.Config.DefaultValueConvention, Spring.Data.MongoDb.Tests'>
+                                    <mongo:exclude-filter type='regex' expression='.*Exclude' />
+                                </mongo:convention-profile>
+                            </objects>";
+            var factory = new XmlObjectFactory(new StringResource(xml, Encoding.UTF8));
+            var profile1 = factory.GetObject<ConventionProfile>("Profile1");
+
+            var lookupProfile = BsonClassMap.LookupConventions(typeof(MyEntityInclude));
+
+            Assert.That(lookupProfile, Is.Not.Null);
+            Assert.That(lookupProfile, Is.EqualTo(profile1));
+
+            lookupProfile = BsonClassMap.LookupConventions(typeof(MyEntityExclude));
+            Assert.That(lookupProfile, Is.Not.SameAs(profile1));
+            Assert.That(lookupProfile.DefaultValueConvention, Is.Not.TypeOf<DefaultValueConvention>());
         }
+    }
+
+    public class MyEntityInclude
+    {
+        
+    }
+
+    public class MyEntityExclude
+    {
 
     }
 

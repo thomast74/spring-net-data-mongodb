@@ -61,8 +61,12 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Data\MongoDb\Config\MongoConventionProfileParser.cs" />
+    <Compile Include="Data\MongoDb\Core\TypeFilters\AssignableTypeFilter.cs" />
+    <Compile Include="Data\MongoDb\Core\TypeFilters\AttributeTypeFilter.cs" />
+    <Compile Include="Data\MongoDb\Config\ConventionProfileParser.cs" />
+    <Compile Include="Data\MongoDb\Core\TypeFilters\CustomTypeFactory.cs" />
     <Compile Include="Data\MongoDb\Config\MongoDatabaseFactoryParser.cs" />
+    <Compile Include="Data\MongoDb\Core\TypeFilters\RegexPatternTypeFilter.cs" />
     <Compile Include="Data\MongoDb\Core\Converters\MongoServerAddressTypeConverter.cs" />
     <Compile Include="Data\MongoDb\Core\Converters\ReadPreferenceTypeConverter.cs" />
     <Compile Include="Data\MongoDb\Config\MongoNamespaceParser.cs" />

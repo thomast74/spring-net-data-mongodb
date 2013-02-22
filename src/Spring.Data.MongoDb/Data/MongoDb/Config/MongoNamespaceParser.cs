@@ -40,7 +40,7 @@ namespace Spring.Data.MongoDb.Config
         {
             RegisterObjectDefinitionParser(ObjectNames.Mongo, new MongoFactoryParser());
             RegisterObjectDefinitionParser(ObjectNames.DbFactory, new MongoDatabaseFactoryParser());
-            RegisterObjectDefinitionParser(ObjectNames.ConventionProfile, new MongoConventionProfileParser());
+            RegisterObjectDefinitionParser(ObjectNames.ConventionProfile, new ConventionProfileParser());
         }
     }
 }

@@ -35,6 +35,8 @@ namespace Spring.Data.MongoDb.Config
         public const string IndexHelper = "IndexCreationHelper";
 	    public const string ValidatingEventListener = "ValidatingMongoEventListener";
 
+        public const string ExcludeFilterElement = "exclude-filter";
+        public const string IncludeFilterElement = "include-filter";
 
         /// ****************************************
         /// * Mongo Object Attributes and Elements

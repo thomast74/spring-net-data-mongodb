@@ -16,7 +16,9 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Conventions;
+using Spring.Aop;
 using Spring.Objects.Factory;
 using MongoDB.Bson.Serialization;
 
@@ -29,6 +31,7 @@ namespace Spring.Data.MongoDb.Core
     public class ConventionProfileFactory : IFactoryObject, IInitializingObject
     {
         private ConventionProfile _profile;
+        private ConventionFilterHelper _filter;
 
         public const string DefaultValueConventionProperty = "DefaultValueConvention";
         public IDefaultValueConvention DefaultValueConvention { get; set; }
@@ -61,6 +64,12 @@ namespace Spring.Data.MongoDb.Core
         public ISerializationOptionsConvention SerializationOptionsConvention { get; set; }
 
 
+        public const string IncludeFiltersProperty = "IncludeFilters";
+        public IList<ITypeFilter> IncludeFilters { get; set; }
+
+        public const string ExcludeFiltersProperty = "ExcludeFilters";
+        public IList<ITypeFilter> ExcludeFilters { get; set; }
+
 
         public object GetObject()
         {
@@ -81,6 +90,7 @@ namespace Spring.Data.MongoDb.Core
         {
             var defaultProfile = ConventionProfile.GetDefault();
             _profile = new ConventionProfile();
+            _filter = new ConventionFilterHelper(IncludeFilters, ExcludeFilters);
 
             _profile.SetDefaultValueConvention(DefaultValueConvention ?? defaultProfile.DefaultValueConvention);
             _profile.SetElementNameConvention(ElementNameConvention ?? defaultProfile.ElementNameConvention);
@@ -93,7 +103,48 @@ namespace Spring.Data.MongoDb.Core
             _profile.SetMemberFinderConvention(MemberFinderConvention ?? defaultProfile.MemberFinderConvention);
             _profile.SetSerializationOptionsConvention(SerializationOptionsConvention ?? defaultProfile.SerializationOptionsConvention);
 
-            BsonClassMap.RegisterConventions(_profile, (t) => { return true; });
+            BsonClassMap.RegisterConventions(_profile, _filter.Filter);
+        }
+
+        public bool ConventionFilter(Type type)
+        {
+            return true;
+        }
+    }
+
+    public class ConventionFilterHelper
+    {
+        private IList<ITypeFilter> _includeFilters;
+        private IList<ITypeFilter> _excludeFilters;
+
+        public ConventionFilterHelper(IList<ITypeFilter> inclTypeFilters, IList<ITypeFilter> excludeFilters)
+        {
+            _includeFilters = inclTypeFilters;
+            _excludeFilters = excludeFilters;
+        }
+
+        public bool Filter(Type type)
+        {
+            if (_includeFilters.Count == 0 && _excludeFilters.Count == 0)
+                return true;
+
+            bool result = false;
+            foreach (var includeFilter in _includeFilters)
+            {
+                if (includeFilter.Matches(type))
+                    result = true;
+            }
+            if (_includeFilters.Count > 0 && !result)
+                return false;
+
+            result = true;
+            foreach (var excludeFilter in _excludeFilters)
+            {
+                if (excludeFilter.Matches(type))
+                    result = false;
+            }
+
+            return result;
         }
     }
 }

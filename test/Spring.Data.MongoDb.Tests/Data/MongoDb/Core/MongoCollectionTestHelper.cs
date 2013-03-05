@@ -1,6 +1,6 @@
 ﻿#region License
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MongoDatabaseTestHelper.cs" company="The original author or authors.">
+// <copyright file="MongoCollectionTestHelper.cs" company="The original author or authors.">
 //   Copyright 2002-2013 the original author or authors.
 //   
 //   Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
@@ -17,23 +17,23 @@
 
 using MongoDB.Driver;
 
-namespace Spring.Data.MongoDb
+namespace Spring.Data.MongoDb.Core
 {
     /// <summary>
-    /// Helper to be able to mock <see cref="MongoDatabase"/>
+    /// Test helper to mock a <see cref="MongoCollection"/> class
     /// </summary>
     /// <author>Thomas Trageser</author>
-    public class MongoDatabaseTestHelper : MongoDatabase
+    public class MongoCollectionTestHelper<T> : MongoCollection<T>
     {
-        public MongoDatabaseTestHelper(MongoServer server, MongoDatabaseSettings settings)
-            : base(server, settings)
+        public MongoCollectionTestHelper(MongoDatabase database, MongoCollectionSettings<T> settings)
+            : base(database, settings)
         {
-
         }
 
-        public new MongoDatabaseSettings Settings
+        public new MongoCollectionSettings Settings
         {
             get { return base.Settings; }
         }
+
     }
 }

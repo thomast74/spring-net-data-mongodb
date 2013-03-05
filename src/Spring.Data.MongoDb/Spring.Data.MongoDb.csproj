@@ -61,6 +61,12 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Data\Mapping\Model\MappingException.cs" />
+    <Compile Include="Data\MongoDb\Core\Attributes\DocumentAttribute.cs" />
+    <Compile Include="Data\MongoDb\Core\FindAndModifyOptions.cs" />
+    <Compile Include="Data\MongoDb\Core\IMongoOperations.cs" />
+    <Compile Include="Data\MongoDb\Core\MongoExceptionTranslator.cs" />
+    <Compile Include="Data\MongoDb\Core\MongoTemplate.cs" />
     <Compile Include="Data\MongoDb\Core\TypeFilters\AssignableTypeFilter.cs" />
     <Compile Include="Data\MongoDb\Core\TypeFilters\AttributeTypeFilter.cs" />
     <Compile Include="Data\MongoDb\Config\ConventionProfileParser.cs" />
@@ -80,7 +86,9 @@
     <Compile Include="Data\MongoDb\Core\MongoFactoryObject.cs" />
     <Compile Include="Data\MongoDb\Core\MongoSynchronisation.cs" />
     <Compile Include="Data\MongoDb\Core\SimpleMongoDatabaseFactory.cs" />
+    <Compile Include="Data\MongoDb\Core\UncategorizedMongoDbException.cs" />
     <Compile Include="Data\MongoDb\IMongoDatabaseFactory.cs" />
+    <Compile Include="Data\MongoDb\Support\Pluralizer.cs" />
     <Compile Include="Transaction\Support\IResourceHolder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Transaction\Support\ResourceHolderSynchronization.cs" />

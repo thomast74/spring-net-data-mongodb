@@ -105,11 +105,6 @@ namespace Spring.Data.MongoDb.Core
 
             BsonClassMap.RegisterConventions(_profile, _filter.Filter);
         }
-
-        public bool ConventionFilter(Type type)
-        {
-            return true;
-        }
     }
 
     public class ConventionFilterHelper

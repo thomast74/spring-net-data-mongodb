@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NSubstitute;
+using Spring.Data.MongoDb.Core;
 
 namespace Spring.Data.MongoDb
 {
@@ -29,7 +30,9 @@ namespace Spring.Data.MongoDb
     /// <author></author>
     public static class MongoTestHelper
     {
+        private static string _message;
         private static MongoServer _server;
+        private static MongoDatabase _datbase;
 
 
         /// <summary>
@@ -38,6 +41,7 @@ namespace Spring.Data.MongoDb
         public static void ClearCache()
         {
             _server = null;
+            _datbase = null;
         }
 
         /// <summary>
@@ -56,6 +60,11 @@ namespace Spring.Data.MongoDb
                             }
                 };
                 _server = Substitute.For<MongoServerTestHelper>(serverSettings);
+                _server.IsDatabaseNameValid(Arg.Any<string>(), out _message).Returns(x =>
+                    {
+                        x[1] = "message";
+                        return true;
+                    });
             }
 
             return _server;
@@ -65,12 +74,42 @@ namespace Spring.Data.MongoDb
         /// Creates a mocked MongoDatabase instance.
         /// </summary>
         /// <returns></returns>
+        public static MongoDatabase GetCachedMockMongoDatabase(string databaseName, WriteConcern writeConcern)
+        {
+            if (_datbase == null)
+            {
+                var server = GetCachedMockMongoServer();
+                var settings = new MongoDatabaseSettings(server, databaseName);
+                settings.WriteConcern = writeConcern;
+
+                _datbase = Substitute.For<MongoDatabaseTestHelper>(server, settings);
+                _datbase.IsCollectionNameValid(Arg.Any<string>(), out _message).Returns(x =>
+                    {
+                        x[1] = "";
+                        return true;
+                    });
+            }
+            return _datbase;
+        }
+
+        /// <summary>
+        /// Creates a mocked MongoDatabase instance.
+        /// </summary>
+        /// <returns></returns>
         public static MongoDatabase GetMockMongoDatabase(string databaseName, WriteConcern writeConcern)
         {
-            var databaseSettings = new MongoDatabaseSettings(databaseName, new MongoCredentials("", ""),
-                                                            GuidRepresentation.Standard, ReadPreference.Primary,
-                                                            writeConcern);
-            return Substitute.For<MongoDatabaseTestHelper>(GetCachedMockMongoServer(), databaseSettings);
+            var server = GetCachedMockMongoServer();
+            var settings = new MongoDatabaseSettings(server, databaseName);
+            settings.WriteConcern = writeConcern;
+
+            var datbase = Substitute.For<MongoDatabaseTestHelper>(server, settings);
+            datbase.IsCollectionNameValid(Arg.Any<string>(), out _message).Returns(x =>
+            {
+                x[1] = "";
+                return true;
+            });
+            
+            return datbase;
         }
 
         /// <summary>
@@ -79,12 +118,14 @@ namespace Spring.Data.MongoDb
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static MongoCollection<T> CreateMockCollection<T>()
+        public static MongoCollection<T> CreateMockCollection<T>(string databaseName, string collectionName)
         {
-            var collectionSetting = new MongoCollectionSettings<T>(GetMockMongoDatabase("databaseName", WriteConcern.Acknowledged), typeof(T).Name);
-            var m = Substitute.For<MongoCollection<T>>(GetMockMongoDatabase("databaseName", WriteConcern.Acknowledged), collectionSetting);
-            m.Database.Returns(GetMockMongoDatabase("databaseName", WriteConcern.Acknowledged));
-            m.Settings.Returns(collectionSetting);
+            var database = GetMockMongoDatabase(databaseName, WriteConcern.Acknowledged);
+            var settings = new MongoCollectionSettings<T>(database, collectionName);
+
+            var m = Substitute.For<MongoCollectionTestHelper<T>>(database, settings);
+            m.Database.Returns(database);
+
             return m;
         }
 

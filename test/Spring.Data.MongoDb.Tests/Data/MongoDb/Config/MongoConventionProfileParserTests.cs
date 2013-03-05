@@ -42,6 +42,16 @@ namespace Spring.Data.MongoDb.Config
             NamespaceParserRegistry.RegisterParser(typeof(MongoNamespaceParser));
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            Type type = typeof (BsonClassMap);
+            FieldInfo field = type.GetField("__profiles", BindingFlags.Static | BindingFlags.NonPublic);
+            Type fieldType = field.FieldType;
+            object profiles = Activator.CreateInstance(fieldType);
+            field.SetValue(null, profiles);
+        }
+
         [Test]
         public void IfNoIdUseDefault()
         {
@@ -193,7 +203,7 @@ namespace Spring.Data.MongoDb.Config
     {
         public string FindExtraElementsMember(Type type)
         {
-            throw new NotImplementedException();
+            return "";
         }
     }
 
@@ -209,7 +219,7 @@ namespace Spring.Data.MongoDb.Config
     {
         public string FindIdMember(Type type)
         {
-            throw new NotImplementedException();
+            return "Id";
         }
     }
 
@@ -217,7 +227,7 @@ namespace Spring.Data.MongoDb.Config
     {
         public bool IgnoreExtraElements(Type type)
         {
-            throw new NotImplementedException();
+            return true;
         }
     }
 
@@ -241,7 +251,7 @@ namespace Spring.Data.MongoDb.Config
     {
         public IEnumerable<MemberInfo> FindMembers(Type type)
         {
-            throw new NotImplementedException();
+            return new List<MemberInfo>();
         }
     }
 

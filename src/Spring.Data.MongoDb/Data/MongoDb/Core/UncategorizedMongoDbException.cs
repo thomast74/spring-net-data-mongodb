@@ -1,6 +1,6 @@
 ﻿#region License
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MongoDatabaseTestHelper.cs" company="The original author or authors.">
+// <copyright file="UncategorizedMongoDbException.cs" company="The original author or authors.">
 //   Copyright 2002-2013 the original author or authors.
 //   
 //   Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
@@ -15,25 +15,26 @@
 // --------------------------------------------------------------------------------------------------------------------
 #endregion
 
-using MongoDB.Driver;
+using System;
+using Spring.Dao;
 
 namespace Spring.Data.MongoDb
 {
     /// <summary>
-    /// Helper to be able to mock <see cref="MongoDatabase"/>
+    /// Exception thrown in case no specific MongoException can be translated
     /// </summary>
     /// <author>Thomas Trageser</author>
-    public class MongoDatabaseTestHelper : MongoDatabase
+    public class UncategorizedMongoDbException : UncategorizedDataAccessException
     {
-        public MongoDatabaseTestHelper(MongoServer server, MongoDatabaseSettings settings)
-            : base(server, settings)
+        /// <summary>
+        /// Creates a UncategorizedMongoDbException with a message and the root cause
+        /// </summary>
+        /// <param name="message">the error message to report</param>
+        /// <param name="cause">the root cause of the exception</param>
+        public UncategorizedMongoDbException(string message, Exception cause)
+            : base(message, cause)
         {
-
         }
 
-        public new MongoDatabaseSettings Settings
-        {
-            get { return base.Settings; }
-        }
     }
 }

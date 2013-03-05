@@ -71,8 +71,14 @@
     <Compile Include="Data\MongoDb\Config\MongoNamespaceParserTests.cs" />
     <Compile Include="Data\MongoDb\Config\MongoFactoryParserTests.cs" />
     <Compile Include="Data\MongoDb\Config\ReadOnlyXmlTestResource.cs" />
+    <Compile Include="Data\MongoDb\Core\HelperClasses\PersonWithAttribute.cs" />
+    <Compile Include="Data\MongoDb\Core\HelperClasses\Person.cs" />
+    <Compile Include="Data\MongoDb\Core\MongoCollectionTestHelper.cs" />
     <Compile Include="Data\MongoDb\Core\MongoDbUtilsTests.cs" />
     <Compile Include="Data\MongoDb\Core\MongoFactoryObjectTests.cs" />
+    <Compile Include="Data\MongoDb\Core\MongoOperationsTests.cs" />
+    <Compile Include="Data\MongoDb\Core\MongoTemplateIntegrationTests.cs" />
+    <Compile Include="Data\MongoDb\Core\MongoTemplateTests.cs" />
     <Compile Include="Data\MongoDb\Core\SimpleMongoDbFactoryTests.cs" />
     <Compile Include="Data\MongoDb\MongoDatabaseTestHelper.cs" />
     <Compile Include="Data\MongoDb\MongoServerTestHelper.cs" />

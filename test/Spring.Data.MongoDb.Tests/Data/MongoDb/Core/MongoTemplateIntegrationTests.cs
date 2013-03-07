@@ -70,6 +70,35 @@ namespace Spring.Data.MongoDb.Core
         }
 
         [Test]
+        public void CreateCollectionWithDefaultOptions()
+        {
+            _template.CreateCollection<Person>("jokes");
+
+            Assert.That(_database.CollectionExists("jokes"));
+        }
+
+        [Test]
+        public void CreateCollectionWithOptions()
+        {
+            var options = CollectionOptions.SetCapped(true).SetMaxSize(8192);
+
+            var jokes = _template.CreateCollection<Person>("jokes", options);
+            Assert.That(jokes, Is.Not.Null);
+            Assert.That(jokes.Name, Is.EqualTo("jokes"));
+            Assert.That(jokes.IsCapped(), Is.True);
+        }
+
+        [Test]
+        public void CreateCollectionThrowsExceptionIfAlreadyExsist()
+        {
+            Assert.That(delegate
+            {
+                _template.CreateCollection<Person>("persons");
+            }, Throws.TypeOf<MongoException>());
+        }
+
+
+        [Test]
         public void GetCollectionNames()
         {
             var names = _template.GetCollectionNames();

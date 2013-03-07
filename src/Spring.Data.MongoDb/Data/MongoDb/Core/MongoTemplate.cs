@@ -113,6 +113,80 @@ namespace Spring.Data.MongoDb.Core
 
             return database.CollectionExists(collectionName);
         }
+
+        /// <summary>
+        /// Create an uncapped collection with a name based on the provided entity type.
+        /// </summary>
+        /// <returns>the created collection</returns>
+        public MongoCollection<T> CreateCollection<T>()
+        {
+            Type type = typeof (T);
+
+            return CreateCollection<T>(DetermineCollectionName(type));
+        }
+
+        /// <summary>
+        /// Create a collect with a name based on the provided entity type using the options.
+        /// </summary>
+        /// <param name="collectionOptions">options to use when creating the collection</param>
+        /// <returns>the created collection</returns>
+        public MongoCollection<T> CreateCollection<T>(IMongoCollectionOptions collectionOptions)
+        {
+            Type type = typeof(T);
+
+            return CreateCollection<T>(DetermineCollectionName(type), collectionOptions);
+        }
+
+        /// <summary>
+        /// Create an uncapped collection with the provided name.
+        /// </summary>
+        /// <param name="collectionName">name of the collection</param>
+        /// <returns>the created collection</returns>
+        public MongoCollection<T> CreateCollection<T>(string collectionName)
+        {
+            return CreateCollection<T>(collectionName, null);
+        }
+
+        /// <summary>
+        /// Create a collect with the provided name and options.
+        /// </summary>
+        /// <param name="collectionName">name of the collection</param>
+        /// <param name="collectionOptions">options to use when creating the collection.</param>
+        /// <returns>the created collection</returns>
+        public MongoCollection<T> CreateCollection<T>(string collectionName, IMongoCollectionOptions collectionOptions)
+        {
+            AssertUtils.ArgumentHasText(collectionName, "collectionName");
+
+            if (collectionName.Contains("\0"))
+                throw new MongoException("Collection name should not contain a null character");
+            if (collectionName.Contains("$"))
+                throw new MongoException("Collection name should not contain a $ character");
+            if (collectionName.StartsWith("system."))
+                throw new MongoException("Collection name should not have 'system.' prefix");
+            if (collectionName.Length > 80)
+                throw new MongoException("Collection name should not longer than 80 characters");
+
+            CommandResult result;
+            MongoDatabase db = GetDatabase();
+            
+            if (db == null)
+                throw new MongoException("No valid database to execute command");
+            try
+            {
+                result = collectionOptions == null
+                             ? db.CreateCollection(collectionName)
+                             : db.CreateCollection(collectionName, collectionOptions);
+
+                if (!result.Ok)
+                    throw new MongoException(result.ErrorMessage);
+
+                return db.GetCollection<T>(collectionName);
+            }
+            catch (Exception e)
+            {
+                throw new MongoException(e.Message);
+            }
+        }
         
         /// <summary>
         /// The collection name used for the specified type by this template.
@@ -352,26 +426,6 @@ namespace Spring.Data.MongoDb.Core
         }
 
         public T ExecuteInSession<T>(Func<MongoDatabase, T> databaseCallback)
-        {
-            throw new NotImplementedException();
-        }
-
-        public MongoCollection CreateCollection<T>()
-        {
-            throw new NotImplementedException();
-        }
-
-        public MongoCollection CreateCollection<T>(IMongoCollectionOptions collectionOptions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public MongoCollection CreateCollection(string collectionName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public MongoCollection CreateCollection(string collectionName, IMongoCollectionOptions collectionOptions)
         {
             throw new NotImplementedException();
         }

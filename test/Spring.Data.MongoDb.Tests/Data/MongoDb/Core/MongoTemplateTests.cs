@@ -18,9 +18,8 @@
 using System;
 using System.Collections.Generic;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using MongoDB.Driver.Builders;
 using NSubstitute;
 using NUnit.Framework;
 using Spring.Dao;
@@ -42,6 +41,8 @@ namespace Spring.Data.MongoDb.Core
         private MongoServer _mongo;
         private MongoDatabase _mongoDatabase;
         private MongoCollection<object> _mongoCollection;
+        private CommandResult _okComandResult;
+        private CommandResult _failComandResult;
 
         [SetUp]
         public void SetUp()
@@ -49,6 +50,9 @@ namespace Spring.Data.MongoDb.Core
             _mongo = MongoTestHelper.GetCachedMockMongoServer();
             _mongoDatabase = MongoTestHelper.GetCachedMockMongoDatabase("test", WriteConcern.Acknowledged);
             _mongoCollection = MongoTestHelper.CreateMockCollection<object>("test", "tests");
+            
+            CreateOkCommandResult();
+            CreateFailCommandResult();
 
             _dbFactory = Substitute.For<IMongoDatabaseFactory>();
             _dbFactory.GetDatabase().Returns(_mongoDatabase);
@@ -109,7 +113,98 @@ namespace Spring.Data.MongoDb.Core
                     _mongoTemplate.CollectionExists("funny");
                 }, Throws.TypeOf<MongoException>());            
         }
-            
+
+        [Test]
+        public void CreateCollectionViaGeneric()
+        {
+            var mongoCollection = MongoTestHelper.CreateMockCollection<Person>("unit", "persons");
+            _mongoDatabase.ClearReceivedCalls();
+            _mongoDatabase.CreateCollection("persons").Returns(_okComandResult);
+            _mongoDatabase.GetCollection<Person>("persons").Returns((MongoCollection)mongoCollection);
+
+            MongoCollection collection = _mongoTemplate.CreateCollection<Person>();
+
+            _mongoDatabase.Received(1).CreateCollection("persons");
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            Assert.That(collection, Is.SameAs(mongoCollection));
+        }
+
+        [Test]
+        public void CreateCollectionViaName()
+        {
+            var mongoCollection = MongoTestHelper.CreateMockCollection<Person>("unit", "persons");
+
+            _mongoDatabase.ClearReceivedCalls();
+            _mongoDatabase.CreateCollection("persons").Returns(_okComandResult);
+            _mongoDatabase.GetCollection<Person>("persons").Returns(mongoCollection);
+
+            var collection = _mongoTemplate.CreateCollection<Person>("persons");
+
+            _mongoDatabase.Received(1).CreateCollection("persons");
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            Assert.That(collection, Is.SameAs(mongoCollection));            
+        }
+
+        [Test]
+        public void CreateCollectionWithOptions()
+        {
+            var options = CollectionOptions.SetMaxDocuments(20);
+
+            var mongoCollection = MongoTestHelper.CreateMockCollection<Person>("unit", "persons");
+            _mongoDatabase.ClearReceivedCalls();
+            _mongoDatabase.CreateCollection("persons", options).Returns(_okComandResult);
+            _mongoDatabase.GetCollection<Person>("persons").Returns(mongoCollection);
+
+            var collection = _mongoTemplate.CreateCollection<Person>("persons", options);
+
+            _mongoDatabase.Received(1).CreateCollection("persons", options);
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            Assert.That(collection, Is.EqualTo(mongoCollection));                        
+        }
+
+        [Test]
+        public void CreateCollectionWithNotAllowedCollectionName()
+        {
+            Assert.That(delegate { _mongoTemplate.CreateCollection<Person>("my$names"); }, Throws.TypeOf<MongoException>());
+            Assert.That(delegate { _mongoTemplate.CreateCollection<Person>("system.fun"); }, Throws.TypeOf<MongoException>());
+            Assert.That(delegate { _mongoTemplate.CreateCollection<Person>("funny\0character"); }, Throws.TypeOf<MongoException>());
+            Assert.That(delegate { _mongoTemplate.CreateCollection<Person>("012345678901234567890123456789012345678901234567890123456789012345678901234567891"); }, Throws.TypeOf<MongoException>());
+        }
+
+        [Test]
+        public void CreateCollectionCommandResultOkFalse()
+        {
+            var mongoCollection = MongoTestHelper.CreateMockCollection<Person>("unit", "persons");
+
+            _mongoDatabase.CreateCollection("jokes").Returns(_failComandResult);
+            _mongoDatabase.GetCollection<Person>("jokes").Returns(mongoCollection);
+
+            Assert.That(delegate
+            {
+                _mongoTemplate.CreateCollection<Person>("jokes");
+            }, Throws.TypeOf<MongoException>());
+        }
+
+        [Test]
+        public void CreateCollectionFailsIfNoCollectionName()
+        {
+            Assert.That(delegate
+                {
+                    _mongoTemplate.CreateCollection<Person>("");
+                }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void CreateCollectionFailsWhenNoDatabase()
+        {
+            _dbFactory.GetDatabase().Returns((MongoDatabase)null);
+
+            Assert.That(delegate
+            {
+                _mongoTemplate.CreateCollection<Person>("funny");
+            }, Throws.TypeOf<MongoException>());
+        }
+
         [Test]
         public void GetCollectioNames()
         {
@@ -225,6 +320,21 @@ namespace Spring.Data.MongoDb.Core
             Assert.That(template.CollectionName, Is.EqualTo("persons"));
             Assert.That(template.ReturnType, Is.EqualTo(typeof (WriteConcernResult)));
             Assert.That(template.Func, Is.Not.Null);
+        }
+
+        private void CreateOkCommandResult()
+        {
+            BsonDocument response = new BsonDocument();
+            response.Add("ok", BsonValue.Create(true));
+            _okComandResult = new CommandResult(null, response);
+        }
+
+        private void CreateFailCommandResult()
+        {
+            BsonDocument response = new BsonDocument();
+            response.Add("ok", BsonValue.Create(false));
+            response.Add("errmsg", BsonValue.Create("Error happen from time to time"));
+            _failComandResult = new CommandResult(null, response);
         }
 
         public class NotExist

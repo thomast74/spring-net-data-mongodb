@@ -82,7 +82,7 @@ namespace Spring.Data.MongoDb.Core
         [Test]
         public void ConvertsExceptionForCreateCollection()
         {
-            DoWith d = operations => operations.CreateCollection("foo");
+            DoWith d = operations => operations.CreateCollection<Person>("foo");
             new Execution(this).AssertDataAccessException(d);
         }
 
@@ -91,7 +91,7 @@ namespace Spring.Data.MongoDb.Core
         {
             var options = new CollectionOptionsBuilder().SetMaxSize(1).SetMaxDocuments(1).SetCapped(true);
 
-            DoWith d = operations => operations.CreateCollection("foo", options);
+            DoWith d = operations => operations.CreateCollection<Person>("foo", options);
             new Execution(this).AssertDataAccessException(d);
         }
 

@@ -118,30 +118,33 @@ namespace Spring.Data.MongoDb.Core
         /// <summary>
         /// Create an uncapped collection with a name based on the provided entity type.
         /// </summary>
+        /// <typeparam name="T">Class to map to collection to</typeparam>
         /// <returns>the created collection</returns>
-        MongoCollection CreateCollection<T>();
+        MongoCollection<T> CreateCollection<T>();
 
         /// <summary>
         /// Create a collect with a name based on the provided entity type using the options.
         /// </summary>
+        /// <typeparam name="T">Class to map to collection to</typeparam>
         /// <param name="collectionOptions">options to use when creating the collection</param>
         /// <returns>the created collection</returns>
-        MongoCollection CreateCollection<T>(IMongoCollectionOptions collectionOptions);
+        MongoCollection<T> CreateCollection<T>(IMongoCollectionOptions collectionOptions);
 
         /// <summary>
         /// Create an uncapped collection with the provided name.
         /// </summary>
         /// <param name="collectionName">name of the collection</param>
         /// <returns>the created collection</returns>
-        MongoCollection CreateCollection(string collectionName);
+        MongoCollection<T> CreateCollection<T>(string collectionName);
 
         /// <summary>
         /// Create a collect with the provided name and options.
         /// </summary>
+        /// <typeparam name="T">Class to map to collection to</typeparam>
         /// <param name="collectionName">name of the collection</param>
         /// <param name="collectionOptions">options to use when creating the collection.</param>
         /// <returns>the created collection</returns>
-        MongoCollection CreateCollection(string collectionName, IMongoCollectionOptions collectionOptions);
+        MongoCollection<T> CreateCollection<T>(string collectionName, IMongoCollectionOptions collectionOptions);
 
         /// <summary>
         /// A set of collection names.

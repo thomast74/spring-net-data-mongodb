@@ -46,20 +46,8 @@ namespace Spring.Data.MongoDb.Core
         {
             Assert.That(delegate
                 {
-                    GetOperations().Execute<object>("test", collection => null);
-
-                },
-                        Throws.TypeOf<ArgumentNullException>());
-        }
-
-        [Test]
-        public void RejectsNullForCollectionCallback2()
-        {
-            Assert.That(delegate
-                {
-                    GetOperations().Execute<object>("collection", collection => null);
-                },
-                        Throws.TypeOf<ArgumentNullException>());
+                    GetOperations().Execute<Person, object>("test", collection => null);
+                }, Throws.TypeOf<ArgumentNullException>());
         }
 
         [Test]
@@ -67,9 +55,8 @@ namespace Spring.Data.MongoDb.Core
         {
             Assert.That(delegate
                 {
-                    GetOperations().Execute<object>(delegate(MongoDatabase database) { return null; });
-                },
-                        Throws.TypeOf<ArgumentNullException>());
+                    GetOperations().Execute<object>(db => null);
+                }, Throws.TypeOf<ArgumentNullException>());
         }
 
         [Test]
@@ -105,21 +92,21 @@ namespace Spring.Data.MongoDb.Core
         [Test]
         public void ConvertsExceptionForExecuteCollectionCallback()
         {
-            DoWith d = operations => operations.Execute<object>("test", collection => null);
+            DoWith d = operations => operations.Execute<Person, object>("test", collection => { return 0; });
             new Execution(this).AssertDataAccessException(d);
         }
 
         [Test]
         public void ConvertsExceptionForExecuteDbCallback()
         {
-            DoWith d = operations => operations.Execute<object>(delegate(MongoDatabase database) { return null; });
+            DoWith d = operations => operations.Execute<object>(db => { return null; });
             new Execution(this).AssertDataAccessException(d);
         }
 
         [Test]
         public void ConvertsExceptionForExecuteCollectionCallbackAndCollection()
         {
-            DoWith d = operations => operations.Execute<object>("collection", null);
+            DoWith d = operations => operations.Execute<Person, object>("collection", null);
             new Execution(this).AssertDataAccessException(d);
         }
 
@@ -154,7 +141,7 @@ namespace Spring.Data.MongoDb.Core
         [Test]
         public void ConvertsExceptionForGetCollectionWithCollectionName()
         {
-            DoWith d = operations => operations.GetCollection("collection");
+            DoWith d = operations => operations.GetCollection<Person>("collection");
             new Execution(this).AssertDataAccessException(d);
         }
 

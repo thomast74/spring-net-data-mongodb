@@ -132,7 +132,7 @@ namespace Spring.Data.MongoDb
         public static MongoCollection<T> ReturnsCollection<T>(this MongoCollection<T> collection,
                                                               IEnumerable<T> enumerable)
         {
-            var cursor = Substitute.For<MongoCursor<T>>(collection, Substitute.For<IMongoQuery>());
+            var cursor = Substitute.For<MongoCursor<T>>(collection, Substitute.For<IMongoQuery>(), ReadPreference.Primary);
             cursor.GetEnumerator().Returns(enumerable.GetEnumerator());
             cursor.When(x => x.GetEnumerator())
                   .Do(callInfo => enumerable.GetEnumerator().Reset());
@@ -148,6 +148,7 @@ namespace Spring.Data.MongoDb
             collection.Find(Arg.Any<IMongoQuery>()).Returns(cursor);
             collection.FindAs<T>(Arg.Any<IMongoQuery>()).Returns(cursor);
             collection.FindAll().Returns(cursor);
+            collection.FindAllAs<T>().Returns(cursor);
             // You properly need to setup more methods of cursor here
 
             return collection;

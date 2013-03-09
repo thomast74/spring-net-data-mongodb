@@ -16,6 +16,7 @@
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -36,7 +37,7 @@ namespace Spring.Data.MongoDb.Core
     [Category(TestCategory.Unit)]
     public class MongoTemplateTests
     {
-        private MongoTemplate _mongoTemplate;
+        private MongoTemplate _template;
         private IMongoDatabaseFactory _dbFactory;
         private MongoServer _mongo;
         private MongoDatabase _mongoDatabase;
@@ -50,7 +51,7 @@ namespace Spring.Data.MongoDb.Core
             _mongo = MongoTestHelper.GetCachedMockMongoServer();
             _mongoDatabase = MongoTestHelper.GetCachedMockMongoDatabase("test", WriteConcern.Acknowledged);
             _mongoCollection = MongoTestHelper.CreateMockCollection<object>("test", "tests");
-            
+
             CreateOkCommandResult();
             CreateFailCommandResult();
 
@@ -58,7 +59,7 @@ namespace Spring.Data.MongoDb.Core
             _dbFactory.GetDatabase().Returns(_mongoDatabase);
             _mongoDatabase.GetCollection<object>(Arg.Any<string>()).Returns(_mongoCollection);
 
-            _mongoTemplate = new MongoTemplate(_dbFactory);
+            _template = new MongoTemplate(_dbFactory);
         }
 
         [Test]
@@ -68,11 +69,11 @@ namespace Spring.Data.MongoDb.Core
             _mongoDatabase.CollectionExists(Arg.Is("persons")).Returns(true);
             _mongoDatabase.CollectionExists(Arg.Is("notExists")).Returns(false);
 
-            var exists = _mongoTemplate.CollectionExists<Person>();
+            var exists = _template.CollectionExists<Person>();
             _mongoDatabase.Received(1).CollectionExists(Arg.Is("persons"));
             Assert.That(exists, Is.True);
 
-            exists = _mongoTemplate.CollectionExists<NotExist>();
+            exists = _template.CollectionExists<NotExist>();
             _mongoDatabase.Received(1).CollectionExists(Arg.Is("notExists"));
             Assert.That(exists, Is.False);
         }
@@ -84,34 +85,23 @@ namespace Spring.Data.MongoDb.Core
             _mongoDatabase.CollectionExists(Arg.Is("persons")).Returns(true);
             _mongoDatabase.CollectionExists(Arg.Is("notExists")).Returns(false);
 
-            var exists = _mongoTemplate.CollectionExists("persons");
+            var exists = _template.CollectionExists("persons");
 
             _mongoDatabase.Received(1).CollectionExists(Arg.Is("persons"));
             Assert.That(exists, Is.True);
 
-            exists = _mongoTemplate.CollectionExists("notExists");
+            exists = _template.CollectionExists("notExists");
             _mongoDatabase.Received(1).CollectionExists(Arg.Is("notExists"));
             Assert.That(exists, Is.False);
         }
-        
+
         [Test]
         public void CollectionExistsMustHaveCollectionName()
         {
             Assert.That(delegate
-            {
-                _mongoTemplate.CollectionExists("");
-            }, Throws.TypeOf<ArgumentNullException>());
-        }
-        
-        [Test]
-        public void CollectionExistsFailsWhenNoDatabase()
-        {
-            _dbFactory.GetDatabase().Returns((MongoDatabase)null);
-
-            Assert.That(delegate
                 {
-                    _mongoTemplate.CollectionExists("funny");
-                }, Throws.TypeOf<MongoException>());            
+                    _template.CollectionExists("");
+                }, Throws.TypeOf<ArgumentNullException>());
         }
 
         [Test]
@@ -120,9 +110,9 @@ namespace Spring.Data.MongoDb.Core
             var mongoCollection = MongoTestHelper.CreateMockCollection<Person>("unit", "persons");
             _mongoDatabase.ClearReceivedCalls();
             _mongoDatabase.CreateCollection("persons").Returns(_okComandResult);
-            _mongoDatabase.GetCollection<Person>("persons").Returns((MongoCollection)mongoCollection);
+            _mongoDatabase.GetCollection<Person>("persons").Returns((MongoCollection) mongoCollection);
 
-            MongoCollection collection = _mongoTemplate.CreateCollection<Person>();
+            MongoCollection collection = _template.CreateCollection<Person>();
 
             _mongoDatabase.Received(1).CreateCollection("persons");
             _mongoDatabase.Received(1).GetCollection<Person>("persons");
@@ -138,11 +128,11 @@ namespace Spring.Data.MongoDb.Core
             _mongoDatabase.CreateCollection("persons").Returns(_okComandResult);
             _mongoDatabase.GetCollection<Person>("persons").Returns(mongoCollection);
 
-            var collection = _mongoTemplate.CreateCollection<Person>("persons");
+            var collection = _template.CreateCollection<Person>("persons");
 
             _mongoDatabase.Received(1).CreateCollection("persons");
             _mongoDatabase.Received(1).GetCollection<Person>("persons");
-            Assert.That(collection, Is.SameAs(mongoCollection));            
+            Assert.That(collection, Is.SameAs(mongoCollection));
         }
 
         [Test]
@@ -155,20 +145,20 @@ namespace Spring.Data.MongoDb.Core
             _mongoDatabase.CreateCollection("persons", options).Returns(_okComandResult);
             _mongoDatabase.GetCollection<Person>("persons").Returns(mongoCollection);
 
-            var collection = _mongoTemplate.CreateCollection<Person>("persons", options);
+            var collection = _template.CreateCollection<Person>("persons", options);
 
             _mongoDatabase.Received(1).CreateCollection("persons", options);
             _mongoDatabase.Received(1).GetCollection<Person>("persons");
-            Assert.That(collection, Is.EqualTo(mongoCollection));                        
+            Assert.That(collection, Is.EqualTo(mongoCollection));
         }
 
         [Test]
         public void CreateCollectionWithNotAllowedCollectionName()
         {
-            Assert.That(delegate { _mongoTemplate.CreateCollection<Person>("my$names"); }, Throws.TypeOf<MongoException>());
-            Assert.That(delegate { _mongoTemplate.CreateCollection<Person>("system.fun"); }, Throws.TypeOf<MongoException>());
-            Assert.That(delegate { _mongoTemplate.CreateCollection<Person>("funny\0character"); }, Throws.TypeOf<MongoException>());
-            Assert.That(delegate { _mongoTemplate.CreateCollection<Person>("012345678901234567890123456789012345678901234567890123456789012345678901234567891"); }, Throws.TypeOf<MongoException>());
+            Assert.That(delegate { _template.CreateCollection<Person>("my$names"); }, Throws.TypeOf<InvalidDataAccessResourceUsageException>());
+            Assert.That(delegate { _template.CreateCollection<Person>("system.fun"); }, Throws.TypeOf<InvalidDataAccessResourceUsageException>());
+            Assert.That(delegate { _template.CreateCollection<Person>("funny\0character"); }, Throws.TypeOf<InvalidDataAccessResourceUsageException>());
+            Assert.That(delegate { _template.CreateCollection<Person>("012345678901234567890123456789012345678901234567890123456789012345678901234567891"); }, Throws.TypeOf<InvalidDataAccessResourceUsageException>());
         }
 
         [Test]
@@ -179,30 +169,140 @@ namespace Spring.Data.MongoDb.Core
             _mongoDatabase.CreateCollection("jokes").Returns(_failComandResult);
             _mongoDatabase.GetCollection<Person>("jokes").Returns(mongoCollection);
 
-            Assert.That(delegate
-            {
-                _mongoTemplate.CreateCollection<Person>("jokes");
-            }, Throws.TypeOf<MongoException>());
+            Assert.That(delegate { _template.CreateCollection<Person>("jokes"); }, Throws.TypeOf<InvalidDataAccessApiUsageException>());
         }
+
 
         [Test]
         public void CreateCollectionFailsIfNoCollectionName()
         {
             Assert.That(delegate
                 {
-                    _mongoTemplate.CreateCollection<Person>("");
+                    _template.CreateCollection<Person>("");
                 }, Throws.TypeOf<ArgumentNullException>());
         }
 
         [Test]
-        public void CreateCollectionFailsWhenNoDatabase()
+        public void DropCollectionViaGeneric()
         {
-            _dbFactory.GetDatabase().Returns((MongoDatabase)null);
+            _mongoDatabase.ClearReceivedCalls();
+            _mongoDatabase.DropCollection("persons").Returns(_okComandResult);
 
-            Assert.That(delegate
-            {
-                _mongoTemplate.CreateCollection<Person>("funny");
-            }, Throws.TypeOf<MongoException>());
+            _template.DropCollection<Person>();
+
+            _mongoDatabase.Received(1).DropCollection("persons");
+        }
+
+        [Test]
+        public void DropCollectionViaName()
+        {
+            _mongoDatabase.ClearReceivedCalls();
+            _mongoDatabase.DropCollection("persons").Returns(_okComandResult);
+
+            _template.DropCollection("persons");
+
+            _mongoDatabase.Received(1).DropCollection("persons");
+        }
+
+        [Test]
+        public void DropCollectionMustHaveaCollectionName()
+        {
+            Assert.That(delegate { _template.DropCollection(""); }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void DropCollectionFailsWhenCollectionDoesNotExists()
+        {
+            _mongoDatabase.ClearReceivedCalls();
+            _mongoDatabase.DropCollection("funny").Returns(_failComandResult);
+
+            Assert.That(delegate { _template.DropCollection("funny"); }, Throws.TypeOf<InvalidDataAccessApiUsageException>());
+        }
+
+        [Test]
+        public void FindAllViaGeneric()
+        {
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<Person> collection = MongoTestHelper.CreateMockCollection<Person>("integration", "persons");
+            collection.ReturnsCollection(GenerateDummyDataPerson());
+            _mongoDatabase.GetCollection<Person>("persons").Returns(collection);
+
+            IList<Person> result = _template.FindAll<Person>();
+
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            collection.Received(1).FindAllAs<Person>();
+            Assert.That(result, Is.EqualTo(GenerateDummyDataPerson()));
+        }
+
+        [Test]
+        public void FindAllViaName()
+        {
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<Person> collection = MongoTestHelper.CreateMockCollection<Person>("integration", "persons");
+            collection.ReturnsCollection(GenerateDummyDataPerson());
+            _mongoDatabase.GetCollection<Person>("persons").Returns(collection);
+
+            IList<Person> result = _template.FindAll<Person>("persons");
+
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            collection.Received(1).FindAllAs<Person>();
+            Assert.That(result, Is.EqualTo(GenerateDummyDataPerson()));
+        }
+
+        [Test]
+        public void FindAllFailsIfNoCollectionNameProvided()
+        {
+            Assert.That(delegate { _template.FindAll<Person>(""); }, Throws.TypeOf<ArgumentNullException>());            
+        }
+
+        [Test]
+        public void GetCollectionViaGeneric()
+        {
+            var mongoCollection = MongoTestHelper.CreateMockCollection<Person>("unit", "persons");
+
+            _mongoDatabase.ClearReceivedCalls();
+            _mongoDatabase.GetCollection<Person>("persons").Returns(mongoCollection);
+
+            var collection = _template.GetCollection<Person>();
+
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            Assert.That(collection, Is.SameAs(mongoCollection));                        
+        }
+
+        [Test]
+        public void GetCollectionByName()
+        {
+            var mongoCollection = MongoTestHelper.CreateMockCollection<Person>("unit", "jokes");
+
+            _mongoDatabase.ClearReceivedCalls();
+            _mongoDatabase.GetCollection<Person>("jokes").Returns(mongoCollection);
+
+            var collection = _template.GetCollection<Person>("jokes");
+
+            _mongoDatabase.Received(1).GetCollection<Person>("jokes");
+            Assert.That(collection, Is.SameAs(mongoCollection));                                    
+        }
+
+        [Test]
+        public void GetCollectionFailIfCollectionNameIsEmpty()
+        {
+            Assert.That(delegate { _template.GetCollection<Person>(""); }, Throws.TypeOf<ArgumentNullException>());            
+        }
+
+        [Test]
+        public void GetCollectionThatWithNotAllowedCollectionName()
+        {
+            Assert.That(delegate { var collection = _template.GetCollection<Person>("jokes$notSoFunny"); }, Throws.TypeOf<InvalidDataAccessResourceUsageException>());
+        }
+
+        [Test]
+        public void GetCollectionThrowsExceptionIfErrorHappen()
+        {
+            _mongoDatabase.ClearReceivedCalls();
+            _mongoDatabase.GetCollection<Person>("jokes").Returns(x => { throw new MongoInternalException("Error"); });
+
+            Assert.That(delegate { _template.GetCollection<Person>("jokes"); }, Throws.TypeOf<InvalidDataAccessResourceUsageException>());
+            _mongoDatabase.Received(1).GetCollection<Person>("jokes");
         }
 
         [Test]
@@ -211,7 +311,7 @@ namespace Spring.Data.MongoDb.Core
             _mongoDatabase.ClearReceivedCalls();
             _mongoDatabase.GetCollectionNames().Returns(new List<string>() { "persons", "nerds", "geeks" });
 
-            var names = _mongoTemplate.GetCollectionNames();
+            var names = _template.GetCollectionNames();
 
             _mongoDatabase.Received(1).GetCollectionNames();
             Assert.That(names, Is.Not.Null);
@@ -219,14 +319,19 @@ namespace Spring.Data.MongoDb.Core
         }
 
         [Test]
-        public void GetCollectioNamesFailsWhenNoDatabase()
+        public void GetDatabaseReturnsDbFactoryDatabase()
+        {
+            _template.GetDatabase();
+
+            _dbFactory.Received(1).GetDatabase();
+        }
+
+        [Test]
+        public void GetDatabasefailsWhenNoDatabase()
         {
             _dbFactory.GetDatabase().Returns((MongoDatabase)null);
 
-            Assert.That(delegate
-                {
-                    _mongoTemplate.GetCollectionNames();
-                }, Throws.TypeOf<MongoException>());
+            Assert.That(delegate { _template.GetDatabase(); }, Throws.TypeOf<DataAccessResourceFailureException>());
         }
 
         [Test]
@@ -252,7 +357,7 @@ namespace Spring.Data.MongoDb.Core
         [Test]
         public void GetCollectionNameViaTypeName()
         {
-            var collectionName = _mongoTemplate.GetCollectionName<Person>();
+            var collectionName = _template.GetCollectionName<Person>();
 
             Assert.That(collectionName, Is.EqualTo("persons"));
         }
@@ -260,7 +365,7 @@ namespace Spring.Data.MongoDb.Core
         [Test]
         public void GetCollectionNameViaAttribute()
         {
-            var collectionName = _mongoTemplate.GetCollectionName<PersonWithAttribute>();
+            var collectionName = _template.GetCollectionName<PersonWithAttribute>();
 
             Assert.That(collectionName, Is.EqualTo("persons"));
         }
@@ -268,7 +373,7 @@ namespace Spring.Data.MongoDb.Core
         [Test]
         public void ShouldGetIdFieldForQuery()
         {
-            IMongoQuery query = _mongoTemplate.GetIdQueryFor(new Person("TT"));
+            IMongoQuery query = _template.GetIdQueryFor(new Person("TT"));
 
             Assert.That(query, Is.Not.Null);
             Assert.That(query.ToString(), Is.EqualTo("{ \"_id\" : ObjectId(\"000000000000000000000000\") }"));
@@ -279,16 +384,12 @@ namespace Spring.Data.MongoDb.Core
         {
             _mongoDatabase.GetCollection("collection").Returns(x => { throw new Exception("Exception"); });
 
-            Assert.That(delegate { _mongoTemplate.Remove((object) null); }, Throws.InstanceOf<DataAccessException>());
-            Assert.That(delegate { _mongoTemplate.Remove("collection", (object) null); },
-                        Throws.InstanceOf<DataAccessException>());
-            Assert.That(delegate { _mongoTemplate.Remove((string) null, (object) null); },
-                        Throws.InstanceOf<DataAccessException>());
-            Assert.That(delegate { _mongoTemplate.Remove<object>(null); }, Throws.InstanceOf<DataAccessException>());
-            Assert.That(delegate { _mongoTemplate.Remove("collection", (IMongoQuery) null); },
-                        Throws.InstanceOf<DataAccessException>());
-            Assert.That(delegate { _mongoTemplate.Remove((string) null, (IMongoQuery) null); },
-                        Throws.InstanceOf<DataAccessException>());
+            Assert.That(delegate { _template.Remove<Person>((Person)null); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(delegate { _template.Remove<Person>("collection", (Person)null); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(delegate { _template.Remove<Person>((string)null, (Person)null); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(delegate { _template.Remove<Person>((IMongoQuery)null); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(delegate { _template.Remove<Person>("collection", (IMongoQuery)null); }, Throws.InstanceOf<ArgumentNullException>());
+            Assert.That(delegate { _template.Remove<Person>((string)null, (IMongoQuery)null); }, Throws.InstanceOf<ArgumentNullException>());
         }
 
         [Test]
@@ -296,7 +397,7 @@ namespace Spring.Data.MongoDb.Core
         {
             Assert.That(delegate
                 {
-                    _mongoTemplate.Execute<object>("collection", null);
+                    _template.Execute<Person, object>("collection", null);
                 }, Throws.TypeOf<ArgumentNullException>());
         }
 
@@ -305,7 +406,7 @@ namespace Spring.Data.MongoDb.Core
         {
             Assert.That(delegate
                 {
-                    _mongoTemplate.Execute<object>((string) null, null);
+                    _template.Execute<Person, object>((string) null, null);
                 }, Throws.TypeOf<ArgumentNullException>());
         }
 
@@ -318,7 +419,6 @@ namespace Spring.Data.MongoDb.Core
 
             Assert.That(template.WasExecuted, Is.True);
             Assert.That(template.CollectionName, Is.EqualTo("persons"));
-            Assert.That(template.ReturnType, Is.EqualTo(typeof (WriteConcernResult)));
             Assert.That(template.Func, Is.Not.Null);
         }
 
@@ -335,6 +435,16 @@ namespace Spring.Data.MongoDb.Core
             response.Add("ok", BsonValue.Create(false));
             response.Add("errmsg", BsonValue.Create("Error happen from time to time"));
             _failComandResult = new CommandResult(null, response);
+        }
+
+        private IList<Person> GenerateDummyDataPerson()
+        {
+            return new List<Person>()
+                {
+                    new Person(new ObjectId("000000000000000000000001"), "Thomas1"),
+                    new Person(new ObjectId("000000000000000000000002"), "Thomas2"),
+                    new Person(new ObjectId("000000000000000000000003"), "Thomas3")
+                };
         }
 
         public class NotExist
@@ -356,7 +466,7 @@ namespace Spring.Data.MongoDb.Core
         {
         }
 
-        public override TReturn Execute<TReturn>(string collectionName,
+        public override TReturn Execute<T, TReturn>(string collectionName,
                                                  Func<MongoCollection, TReturn> collectionCallback)
         {
             _collectionName = collectionName;

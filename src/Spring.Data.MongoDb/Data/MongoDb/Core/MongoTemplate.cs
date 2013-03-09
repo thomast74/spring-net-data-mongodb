@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Common.Logging;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -89,11 +90,7 @@ namespace Spring.Data.MongoDb.Core
         /// <returns><code>true</code> if a collection with the given name is found, <code>false</code> otherwise.</returns>
         public bool CollectionExists<T>()
         {
-            var collectionName = DetermineCollectionName(typeof (T));
-
-            AssertUtils.ArgumentHasText(collectionName, "collectionName");
-
-            return CollectionExists(collectionName);
+            return CollectionExists(DetermineCollectionName(typeof (T)));
         }
 
         /// <summary>
@@ -107,11 +104,7 @@ namespace Spring.Data.MongoDb.Core
         {
             AssertUtils.ArgumentHasText(collectionName, "collectionName");
 
-            MongoDatabase database = GetDatabase();
-            if (database == null)
-                throw new MongoException("Error while retrieving database to check if collection exists");
-
-            return database.CollectionExists(collectionName);
+            return Execute<bool>(db => db.CollectionExists(collectionName));
         }
 
         /// <summary>
@@ -120,9 +113,7 @@ namespace Spring.Data.MongoDb.Core
         /// <returns>the created collection</returns>
         public MongoCollection<T> CreateCollection<T>()
         {
-            Type type = typeof (T);
-
-            return CreateCollection<T>(DetermineCollectionName(type));
+            return CreateCollection<T>(DetermineCollectionName(typeof (T)));
         }
 
         /// <summary>
@@ -132,9 +123,7 @@ namespace Spring.Data.MongoDb.Core
         /// <returns>the created collection</returns>
         public MongoCollection<T> CreateCollection<T>(IMongoCollectionOptions collectionOptions)
         {
-            Type type = typeof(T);
-
-            return CreateCollection<T>(DetermineCollectionName(type), collectionOptions);
+            return CreateCollection<T>(DetermineCollectionName(typeof(T)), collectionOptions);
         }
 
         /// <summary>
@@ -155,37 +144,125 @@ namespace Spring.Data.MongoDb.Core
         /// <returns>the created collection</returns>
         public MongoCollection<T> CreateCollection<T>(string collectionName, IMongoCollectionOptions collectionOptions)
         {
+            AssertUtils.ArgumentHasText(collectionName, collectionName);
+
+            VerifyCollectionNameIsValid(collectionName);
+
+            return Execute<MongoCollection<T>>(db =>
+                {
+                    CommandResult result = collectionOptions == null
+                                               ? db.CreateCollection(collectionName)
+                                               : db.CreateCollection(collectionName, collectionOptions);
+                    if (!result.Ok)
+                        throw new MongoCommandException(result.ErrorMessage);
+
+                    return db.GetCollection<T>(collectionName);
+                });
+        }
+
+
+        /// <summary>
+        /// Drop the collection with the name indicated by the entity type.
+        /// <p />
+        /// Translate any exceptions as necessary.
+        /// </summary>
+        /// <exception cref="MongoException">if collection could not have been dropped</exception>
+        public void DropCollection<T>()
+        {
+            DropCollection(DetermineCollectionName(typeof(T)));
+        }
+
+        /// <summary>
+        /// Drop the collection with the given name.
+        /// <p />
+        /// Translate any exceptions as necessary.
+        /// </summary>
+        /// <param name="collectionName">name of the collection to drop/delete</param>
+        /// <exception cref="MongoException">if collection could not have been dropped</exception>
+        public void DropCollection(string collectionName)
+        {
             AssertUtils.ArgumentHasText(collectionName, "collectionName");
 
-            if (collectionName.Contains("\0"))
-                throw new MongoException("Collection name should not contain a null character");
-            if (collectionName.Contains("$"))
-                throw new MongoException("Collection name should not contain a $ character");
-            if (collectionName.StartsWith("system."))
-                throw new MongoException("Collection name should not have 'system.' prefix");
-            if (collectionName.Length > 80)
-                throw new MongoException("Collection name should not longer than 80 characters");
+            VerifyCollectionNameIsValid(collectionName);
 
-            CommandResult result;
-            MongoDatabase db = GetDatabase();
-            
-            if (db == null)
-                throw new MongoException("No valid database to execute command");
-            try
-            {
-                result = collectionOptions == null
-                             ? db.CreateCollection(collectionName)
-                             : db.CreateCollection(collectionName, collectionOptions);
+            Execute<bool>(db =>
+                {
+                    CommandResult result = db.DropCollection(collectionName);
 
-                if (!result.Ok)
-                    throw new MongoException(result.ErrorMessage);
+                    if (!result.Ok)
+                        throw new MongoCommandException(result.ErrorMessage);
 
-                return db.GetCollection<T>(collectionName);
-            }
-            catch (Exception e)
-            {
-                throw new MongoException(e.Message);
-            }
+                    return true;
+                });
+        }
+
+
+        /// <summary>
+        /// Query for a list of objects of type T from the collection used by the entity class.
+        /// <p />
+        /// If your collection does not contain a homogeneous collection of types, this operation will not be an 
+        /// efficient way to map objects since the test for object type is done in the client and not on the server.
+        /// </summary>
+        /// <returns>the converted collection</returns>
+        public IList<T> FindAll<T>()
+        {
+            return FindAll<T>(DetermineCollectionName(typeof (T)));
+        }
+
+        /// <summary>
+        /// Query for a list of objects of type T from the specified collection.
+        /// <p />
+        /// If your collection does not contain a homogeneous collection of types, this operation will not be an 
+        /// efficient way to map objects since the test for class type is done in the client and not on the server.
+        /// </summary>
+        /// <param name="collectionName"></param> collectionName name of the collection to retrieve the objects from
+        /// <returns>the converted collection</returns>
+        public IList<T> FindAll<T>(string collectionName)
+        {
+            return Execute<T, IList<T>>(collectionName, collection =>
+                {
+                    var result = collection.FindAllAs<T>();
+                    return result.ToList();
+                });
+        }
+
+        /// <summary>
+        /// Get a collection by name derived form provided entity type, creating it if it doesn't exist.
+        /// <p />
+        /// Translate any exceptions as necessary.
+        /// </summary>
+        /// <typeparam name="T">Type used to determin the collection name. Class map the retrieved collection to provided type</typeparam>
+        /// <returns>an existing collection or a newly created one.</returns>
+        public MongoCollection<T> GetCollection<T>()
+        {
+            return GetCollection<T>(DetermineCollectionName(typeof (T)));
+        }
+
+        /// <summary>
+        /// Get a collection by name, creating it if it doesn't exist.
+        /// <p />
+        /// Translate any exceptions as necessary.
+        /// </summary>
+        /// <typeparam name="T">Class map the retrieved collection to provided type</typeparam>
+        /// <param name="collectionName">name of the collection</param>
+        /// <returns>an existing collection or a newly created one.</returns>
+        public MongoCollection<T> GetCollection<T>(string collectionName)
+        {
+            AssertUtils.ArgumentHasText(collectionName, "collectionName");
+
+            VerifyCollectionNameIsValid(collectionName);
+
+            return Execute<MongoCollection<T>>(db =>
+                {
+                    try
+                    {
+                        return db.GetCollection<T>(collectionName);
+                    }
+                    catch (Exception e)
+                    {
+                        throw PotentiallyConvertException(e);
+                    }
+                });
         }
         
         /// <summary>
@@ -203,12 +280,10 @@ namespace Spring.Data.MongoDb.Core
         /// <returns></returns> list of collection names
         public IList<string> GetCollectionNames()
         {
-            MongoDatabase database = GetDatabase();
-
-            if (database == null)
-                throw new MongoException("Error while retrieving database to get collection names");
-
-            return database.GetCollectionNames().ToList();
+            return Execute<IList<string>>(db =>
+                {
+                    return db.GetCollectionNames().ToList();
+                });
         }
         
         /// <summary>
@@ -220,24 +295,50 @@ namespace Spring.Data.MongoDb.Core
         /// <returns></returns>
         public TReturn Execute<TType, TReturn>(Func<MongoCollection, TReturn> collectionCallback)
         {
-		    return Execute(DetermineCollectionName(typeof(TType)), collectionCallback);
+            return Execute<TType, TReturn>(DetermineCollectionName(typeof(TType)), collectionCallback);
 	    }
 
         /// <summary>
         /// Executes a command on the given Func.
         /// </summary>
+        /// <typeparam name="T">The type of the collection</typeparam>
         /// <typeparam name="TReturn">The return type of the execution</typeparam>
         /// <param name="collectionName">the collection to use for the execution</param>
         /// <param name="collectionCallback">the Func that will be run for the retrived collection </param>
         /// <returns></returns>
-        public virtual TReturn Execute<TReturn>(string collectionName, Func<MongoCollection, TReturn> collectionCallback)
+        public virtual TReturn Execute<T, TReturn>(string collectionName, Func<MongoCollection, TReturn> collectionCallback)
         {
+            AssertUtils.ArgumentHasText(collectionName, "collectionName");
             AssertUtils.ArgumentNotNull(collectionCallback, "collectionCallback");
+
+            VerifyCollectionNameIsValid(collectionName);
 
             try
             {
-                MongoCollection collection = GetAndPrepareCollection(GetDatabase(), collectionName);
+                MongoCollection<T> collection = GetCollection<T>(collectionName);
                 return collectionCallback(collection);
+            }
+            catch (Exception e)
+            {
+                throw PotentiallyConvertException(e);
+            }
+        }
+
+        /// <summary>
+        /// Executes the given callback action, translating any exceptions as necessary.
+        /// <p />
+        /// Allows for returning a result object, that is a domain object or a collection of domain objects.
+        /// </summary>
+        /// <param name="databaseCallback">callback object that specifies the MongoDB actions to perform on the passed
+        /// in DB instance.</param>
+        /// <returns>a result object returned by the action or <code>null</code></returns>
+        public TReturn Execute<TReturn>(Func<MongoDatabase, TReturn> databaseCallback)
+        {
+            AssertUtils.ArgumentNotNull(databaseCallback, "databaseCallback");
+
+            try
+            {
+                return databaseCallback(GetDatabase());
             }
             catch (Exception e)
             {
@@ -253,21 +354,23 @@ namespace Spring.Data.MongoDb.Core
         /// </returns>
         public MongoDatabase GetDatabase()
         {
-            return _mongoDbFactory.GetDatabase();
+            MongoDatabase db = _mongoDbFactory.GetDatabase();
+
+            if (db == null)
+                throw new DataAccessResourceFailureException("Factory did not provide a valid database");
+
+            return db;
         }
 
         /// <summary>
         /// Remove the given object from the collection by id.
         /// </summary>
         /// <param name="objectToRemove">object to remove</param>
-        public void Remove(object objectToRemove)
+        public void Remove<T>(T objectToRemove)
         {
-            if (objectToRemove == null)
-                throw new InvalidDataAccessApiUsageException("Object passed in to remove can't be null");
+            AssertUtils.ArgumentNotNull(objectToRemove, "objectToRemove");
 
-            string collectionName = DetermineCollectionName(objectToRemove.GetType());
-
-            Remove(collectionName, objectToRemove);
+            Remove<T>(DetermineCollectionName(objectToRemove.GetType()), objectToRemove);
         }
 
         /// <summary>
@@ -275,15 +378,11 @@ namespace Spring.Data.MongoDb.Core
         /// </summary>
         /// <param name="objectToRemove">object to remove</param>
         /// <param name="collectionName">must not be <code>null</code> or empty.</param>
-        public void Remove(string collectionName, object objectToRemove)
+        public void Remove<T>(string collectionName, T objectToRemove)
         {
-            if (collectionName == null)
-                throw new InvalidDataAccessApiUsageException("Collection name passed in to remove an object can't be null");
+            AssertUtils.ArgumentNotNull(objectToRemove, "objectToRemove");
 
-            if (objectToRemove == null)
-                throw new InvalidDataAccessApiUsageException("Object passed in to remove can't be null");
-
-            Remove(collectionName, GetIdQueryFor(objectToRemove));
+            Remove<T>(collectionName, GetIdQueryFor(objectToRemove));
         }
 
         /// <summary>
@@ -294,9 +393,7 @@ namespace Spring.Data.MongoDb.Core
         /// <param name="query"></param>
         public void Remove<T>(IMongoQuery query)
         {
-            string collectionName = DetermineCollectionName(typeof (T));
-
-            Remove(collectionName, query);
+            Remove<T>(DetermineCollectionName(typeof (T)), query);
         }
 
         /// <summary>
@@ -305,28 +402,25 @@ namespace Spring.Data.MongoDb.Core
         /// </summary>
         /// <param name="query">the query document that specifies the criteria used to remove a record</param>
         /// <param name="collectionName">name of the collection where the objects will removed</param>
-        public void Remove(string collectionName, IMongoQuery query)
+        public void Remove<T>(string collectionName, IMongoQuery query)
         {
-            if (collectionName == null)
-                throw new InvalidDataAccessApiUsageException("Collection name passed in to remove an object can't be null");
+            AssertUtils.ArgumentNotNull(query, "query");
 
-            if (query == null)
-                throw new InvalidDataAccessApiUsageException("Query passed in to remove can't be null");
-
-
-            Execute<WriteConcernResult>(collectionName, (MongoCollection collection) =>
+            Execute<T,bool>(collectionName, collection =>
                 {
                     if (Logger.IsDebugEnabled)
                     {
                         Logger.Debug("remove using query: " + query + " in collection: " + collection.Name);
                     }
 
-                    if (_writeConcern == null)
-                    {
-                        return collection.Remove(query);
-                    }
+                    WriteConcernResult result = _writeConcern == null
+                                                    ? collection.Remove(query)
+                                                    : collection.Remove(query, _writeConcern);
+                    
+                    if (!result.Ok)
+                        throw new MongoCommandException(result.LastErrorMessage);
 
-                    return collection.Remove(query, _writeConcern);
+                    return true;
                 });
         }
 
@@ -360,15 +454,36 @@ namespace Spring.Data.MongoDb.Core
             return Pluralizer.ToPluralWithUncapitalize(entityType.Name);
         }
 
-        private MongoCollection GetAndPrepareCollection(MongoDatabase db, string collectionName)
+        private void VerifyCollectionNameIsValid(string collectionName)
         {
-            try
+            if (collectionName == null)
             {
-                return db.GetCollection(collectionName);
+                throw new ArgumentNullException("collectionName");
             }
-            catch (SystemException e)
+
+            if (collectionName == "")
             {
-                throw PotentiallyConvertException(e);
+                throw new InvalidDataAccessResourceUsageException("Collection name cannot be empty.");
+            }
+
+            if (collectionName.IndexOf('\0') != -1)
+            {
+                throw new InvalidDataAccessResourceUsageException("Collection name cannot contain null characters.");
+            }
+
+            if (collectionName.IndexOf('$') != -1)
+            {
+                throw new InvalidDataAccessResourceUsageException("Collection name cannot contain $ characters.");
+            }
+
+            if (collectionName.StartsWith("system."))
+            {
+                throw new InvalidDataAccessResourceUsageException("Collection name cannot start with 'system.'.");
+            }
+
+            if (Encoding.UTF8.GetBytes(collectionName).Length > 80)
+            {
+                throw new InvalidDataAccessResourceUsageException("Collection name cannot exceed 121 bytes (after encoding to UTF-8).");
             }
         }
 
@@ -420,42 +535,7 @@ namespace Spring.Data.MongoDb.Core
             throw new NotImplementedException();
         }
 
-        public T Execute<T>(Func<MongoDatabase, T> databaseCallback)
-        {
-            throw new NotImplementedException();
-        }
-
         public T ExecuteInSession<T>(Func<MongoDatabase, T> databaseCallback)
-        {
-            throw new NotImplementedException();
-        }
-
-        public MongoCollection GetCollection<T>()
-        {
-            throw new NotImplementedException();
-        }
-
-        public MongoCollection GetCollection(string collectionName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DropCollection<T>()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DropCollection(string collectionName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public System.Collections.Generic.IList<T> FindAll<T>()
-        {
-            throw new NotImplementedException();
-        }
-
-        public System.Collections.Generic.IList<T> FindAll<T>(string collectionName)
         {
             throw new NotImplementedException();
         }

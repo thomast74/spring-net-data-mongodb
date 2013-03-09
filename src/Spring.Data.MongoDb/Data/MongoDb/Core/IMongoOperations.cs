@@ -89,8 +89,8 @@ namespace Spring.Data.MongoDb.Core
         /// <p />
         /// Allows for returning a result object, that is a domain object or a collection of domain objects.
         /// </summary>
-        /// <typeparam name="TType"></typeparam>
-        /// <typeparam name="TReturn"></typeparam>
+        /// <typeparam name="TType">The type of the collection</typeparam>
+        /// <typeparam name="TReturn">The return type of the callback</typeparam>
         /// <param name="collectionCallback">callback object that specifies the MongoDB action</param>
         /// <returns></returns> a result object returned by the action or <tt>null</tt>
         TReturn Execute<TType, TReturn>(Func<MongoCollection, TReturn> collectionCallback);
@@ -100,10 +100,12 @@ namespace Spring.Data.MongoDb.Core
         /// <p />
         /// Allows for returning a result object, that is a domain object or a collection of domain objects.
         /// </summary>
+        /// <typeparam name="TType">The type of the collection</typeparam>
+        /// <typeparam name="TReturn">The return type of the callback</typeparam>
         /// <param name="collectionName">the name of the collection that specifies which DBCollection instance</param>
         /// <param name="collectionCallback">callback object that specifies the MongoDatabase action the callback action will be passed into</param>
         /// <returns>a result object returned by the action or <code>null</code></returns>
-        TReturn Execute<TReturn>(string collectionName, Func<MongoCollection, TReturn> collectionCallback);
+        TReturn Execute<TType, TReturn>(string collectionName, Func<MongoCollection, TReturn> collectionCallback);
 
         /// <summary>
         /// Executes the given callback within the same connection to the database so as to ensure 
@@ -157,23 +159,26 @@ namespace Spring.Data.MongoDb.Core
         /// <p />
         /// Translate any exceptions as necessary.
         /// </summary>
+        /// <typeparam name="T">Type used to determin the collection name. Class map the retrieved collection to provided type</typeparam>
         /// <returns>an existing collection or a newly created one.</returns>
-        MongoCollection GetCollection<T>();
+        MongoCollection<T> GetCollection<T>();
 
         /// <summary>
         /// Get a collection by name, creating it if it doesn't exist.
         /// <p />
         /// Translate any exceptions as necessary.
         /// </summary>
+        /// <typeparam name="T">Class map the retrieved collection to provided type</typeparam>
         /// <param name="collectionName">name of the collection</param>
         /// <returns>an existing collection or a newly created one.</returns>
-        MongoCollection GetCollection(string collectionName);
+        MongoCollection<T> GetCollection<T>(string collectionName);
 
         /// <summary>
         /// Check to see if a collection with a name indicated by the entity type exists.
         /// <p />
         /// Translate any exceptions as necessary.
         /// </summary>
+        /// <typeparam name="T">Type to determine the collection and name</typeparam>
         /// <returns><code>true</code> if a collection with the given name is found, <code>false</code> otherwise.</returns>
         bool CollectionExists<T>();
 
@@ -191,6 +196,7 @@ namespace Spring.Data.MongoDb.Core
         /// <p />
         /// Translate any exceptions as necessary.
         /// </summary>
+        /// <returns>true if collection was dropped successfully, false if an error happened</returns>
         void DropCollection<T>();
 
         /// <summary>
@@ -199,6 +205,7 @@ namespace Spring.Data.MongoDb.Core
         /// Translate any exceptions as necessary.
         /// </summary>
         /// <param name="collectionName">name of the collection to drop/delete</param>
+        /// <returns>true if collection was dropped successfully, false if an error happened</returns>
         void DropCollection(string collectionName);
 
         /// <summary>
@@ -599,20 +606,21 @@ namespace Spring.Data.MongoDb.Core
         /// Remove the given object from the collection by id.
         /// </summary>
         /// <param name="objectToRemove">object to remove</param>
-        void Remove(object objectToRemove);
+        void Remove<T>(T objectToRemove);
 
         /// <summary>
         /// Removes the given object from the given collection.
         /// </summary>
         /// <param name="objecToRemove">object to remove</param>
         /// <param name="collectionName">must not be <code>nukk</code> or empty.</param>
-        void Remove(string collectionName, object objecToRemove);
+        void Remove<T>(string collectionName, T objecToRemove);
 
         /// <summary>
         /// Remove all documents that match the provided query document criteria from the the collection used 
         /// to store the entity type. The Class parameter is also used to help convert the Id of the object if 
         /// it is present in the query.
         /// </summary>
+        /// <typeparam name="T">The type of the collection</typeparam>
         /// <param name="query"></param>
         void Remove<T>(IMongoQuery query);
 
@@ -620,8 +628,9 @@ namespace Spring.Data.MongoDb.Core
         /// Remove all documents from the specified collection that match the provided query document criteria. 
         /// There is no conversion/mapping done for any criteria using the id field.
         /// </summary>
+        /// <typeparam name="T">The type of the collection</typeparam>
         /// <param name="query">the query document that specifies the criteria used to remove a record</param>
         /// <param name="collectionName">name of the collection where the objects will removed</param>
-        void Remove(string collectionName, IMongoQuery query);
+        void Remove<T>(string collectionName, IMongoQuery query);
     }
 }

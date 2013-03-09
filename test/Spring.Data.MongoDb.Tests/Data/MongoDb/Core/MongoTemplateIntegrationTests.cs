@@ -17,11 +17,10 @@
 
 using System.Collections.Generic;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using NUnit.Framework;
+using Spring.Dao;
 using Spring.Data.MongoDb.Core.HelperClasses;
 using Spring.Util;
 
@@ -91,12 +90,70 @@ namespace Spring.Data.MongoDb.Core
         [Test]
         public void CreateCollectionThrowsExceptionIfAlreadyExsist()
         {
-            Assert.That(delegate
-            {
-                _template.CreateCollection<Person>("persons");
-            }, Throws.TypeOf<MongoException>());
+            Assert.That(delegate { _template.CreateCollection<Person>("persons"); }, Throws.TypeOf<InvalidDataAccessApiUsageException>());
         }
 
+        [Test]
+        public void DropCollectionViaGeneric()
+        {
+            _template.DropCollection<Person>();
+
+            Assert.That(_database.CollectionExists("persons"), Is.False);
+        }
+
+        [Test]
+        public void DropCollectionViaName()
+        {
+            _template.DropCollection("persons");
+
+            Assert.That(_database.CollectionExists("persons"), Is.False);
+        }
+
+        [Test]
+        public void DropCollectionThatDoesNotExists()
+        {
+            Assert.That(delegate { _template.DropCollection("funny"); }, Throws.TypeOf<InvalidDataAccessApiUsageException>());
+        }
+
+        [Test]
+        public void FindAllViaGeneric()
+        {
+            IList<Person> result = _template.FindAll<Person>();
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Has.Count.EqualTo(5));
+            Assert.That(result[0].Id, Is.EqualTo(new ObjectId("000000000000000000000001")));
+            Assert.That(result[0].FirstName, Is.EqualTo("Thomas"));
+        }
+
+        [Test]
+        public void FindAllViaName()
+        {
+            IList<Person> result = _template.FindAll<Person>("persons");
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Has.Count.EqualTo(5));
+            Assert.That(result[0].Id, Is.EqualTo(new ObjectId("000000000000000000000001")));
+            Assert.That(result[0].FirstName, Is.EqualTo("Thomas"));            
+        }
+
+        [Test]
+        public void GetCollectionViaGeneric()
+        {
+            var collection = _template.GetCollection<Person>();
+
+            Assert.That(collection, Is.Not.Null);
+            Assert.That(collection.Name, Is.EqualTo("persons"));
+        }
+
+        [Test]
+        public void GetCollectionByName()
+        {
+            var collection = _template.GetCollection<Person>("persons");
+
+            Assert.That(collection, Is.Not.Null);
+            Assert.That(collection.Name, Is.EqualTo("persons"));
+        }
 
         [Test]
         public void GetCollectionNames()

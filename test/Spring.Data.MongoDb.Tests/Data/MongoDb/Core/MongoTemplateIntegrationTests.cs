@@ -116,6 +116,29 @@ namespace Spring.Data.MongoDb.Core
         }
 
         [Test]
+        public void FindShouldReturnPerson()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+
+            IList<Person> persons = _template.Find<Person>(query);
+
+            Assert.That(persons, Has.Count.EqualTo(1));
+            Assert.That(persons[0].Id, Is.EqualTo(new ObjectId("000000000000000000000001")));
+            Assert.That(persons[0].FirstName, Is.EqualTo("Thomas"));
+        }
+
+        [Test]
+        public void FindShouldReturnNullIfNotFound()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "ThomasT");
+
+            IList<Person> persons = _template.Find<Person>(query);
+
+            Assert.That(persons, Is.Not.Null);
+            Assert.That(persons, Has.Count.EqualTo(0));
+        }
+
+        [Test]
         public void FindAllViaGeneric()
         {
             IList<Person> result = _template.FindAll<Person>();
@@ -135,6 +158,113 @@ namespace Spring.Data.MongoDb.Core
             Assert.That(result, Has.Count.EqualTo(5));
             Assert.That(result[0].Id, Is.EqualTo(new ObjectId("000000000000000000000001")));
             Assert.That(result[0].FirstName, Is.EqualTo("Thomas"));            
+        }
+
+        [Test]
+        public void FindAndModifyShouldReturnUpdateAndReturnOldDocument()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+            IMongoSortBy sortBy = new SortByBuilder<Person>().Ascending(p => p.Id);
+            IMongoUpdate update = new UpdateBuilder<Person>().Set(p => p.FirstName, "Thomas T");
+
+            Person oldPerson = _template.FindAndModify<Person>(query, sortBy, update);
+
+            Assert.That(oldPerson.FirstName, Is.EqualTo("Thomas"));
+
+            Person newPerson = _template.FindById<Person>(new ObjectId("000000000000000000000001"));
+
+            Assert.That(newPerson.FirstName, Is.EqualTo("Thomas T"));
+        }
+
+        [Test]
+        public void FindAndModifyShouldReturnUpdateAndReturnNewDocument()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+            IMongoSortBy sortBy = new SortByBuilder<Person>().Ascending(p => p.Id);
+            IMongoUpdate update = new UpdateBuilder<Person>().Set(p => p.FirstName, "Thomas T");
+            FindAndModifyOptions options = FindAndModifyOptions.Default().ReturnNew(true);
+
+            Person newPerson = _template.FindAndModify<Person>(query, sortBy, update, options);
+
+            Assert.That(newPerson.FirstName, Is.EqualTo("Thomas T"));
+
+            newPerson = _template.FindById<Person>(new ObjectId("000000000000000000000001"));
+
+            Assert.That(newPerson.FirstName, Is.EqualTo("Thomas T"));
+        }
+
+        [Test]
+        public void FindAndModifyShouldReturnNullIfNotFound()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas S");
+            IMongoSortBy sortBy = new SortByBuilder<Person>().Ascending(p => p.Id);
+            IMongoUpdate update = new UpdateBuilder<Person>().Set(p => p.FirstName, "Thomas D");
+
+            Person newPerson = _template.FindAndModify<Person>(query, sortBy, update);
+
+            Assert.That(newPerson, Is.Null);
+
+            IList<Person> persons = _template.Find<Person>(query);
+
+            Assert.That(persons, Has.Count.EqualTo(0));
+        }
+        
+        [Test]
+        public void FindAndModifyShouldCreateNewDocumentIfNotFound()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas T");
+            IMongoSortBy sortBy = new SortByBuilder<Person>().Ascending(p => p.Id);
+            IMongoUpdate update = new UpdateBuilder<Person>().Set(p => p.FirstName, "Thomas T");
+            FindAndModifyOptions options = FindAndModifyOptions.Default().Upsert(true);
+
+            Person newPerson = _template.FindAndModify<Person>(query, sortBy, update, options);
+
+            Assert.That(newPerson, Is.Not.Null);
+            Assert.That(newPerson.Id, Is.EqualTo(new ObjectId("000000000000000000000000")));
+            Assert.That(newPerson.FirstName, Is.Null);
+
+            IList<Person> persons = _template.Find<Person>(query);
+
+            Assert.That(persons, Has.Count.EqualTo(1));
+        }
+
+        [Test]
+        public void FindAndModifyShouldCreateNewDocumentIfNotFoundAndReturnNewDocument()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas T");
+            IMongoSortBy sortBy = new SortByBuilder<Person>().Ascending(p => p.Id);
+            IMongoUpdate update = new UpdateBuilder<Person>().Set(p => p.FirstName, "Thomas T");
+            FindAndModifyOptions options = FindAndModifyOptions.Default().ReturnNew(true).Upsert(true);
+
+            Person newPerson = _template.FindAndModify<Person>(query, sortBy, update, options);
+
+            Assert.That(newPerson.FirstName, Is.EqualTo("Thomas T"));
+
+            IList<Person> persons = _template.Find<Person>(query);
+
+            Assert.That(persons, Has.Count.EqualTo(1));
+        }
+        
+        [Test]
+        public void FindAndRemoveShouldReturnPerson()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+            IMongoSortBy sortBy = new SortByBuilder<Person>().Ascending(p => p.Id);
+
+            Person person = _template.FindAndRemove<Person>("persons", query, sortBy);
+
+            Assert.That(person, Is.Not.Null);
+            Assert.That(person.Id, Is.EqualTo(new ObjectId("000000000000000000000001")));
+            Assert.That(person.FirstName, Is.EqualTo("Thomas"));
+        }
+
+        [Test]
+        public void FindAndRemoveShouldFailIfRecordNotFound()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "ThomasT");
+            IMongoSortBy sortBy = new SortByBuilder<Person>().Ascending(p => p.Id);
+
+            Person person = _template.FindAndRemove<Person>("persons", query, sortBy);
         }
 
         [Test]

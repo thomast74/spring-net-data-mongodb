@@ -16,7 +16,6 @@
 #endregion
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -44,6 +43,8 @@ namespace Spring.Data.MongoDb.Core
         private MongoCollection<object> _mongoCollection;
         private CommandResult _okComandResult;
         private CommandResult _failComandResult;
+        private FindAndModifyResult _okFindAndModifyResult;
+        private FindAndModifyResult _failFindAndModifyResult;
 
         [SetUp]
         public void SetUp()
@@ -54,6 +55,8 @@ namespace Spring.Data.MongoDb.Core
 
             CreateOkCommandResult();
             CreateFailCommandResult();
+            CreateOkFindAndModifyResult();
+            CreateFailFindAndModifyResult();
 
             _dbFactory = Substitute.For<IMongoDatabaseFactory>();
             _dbFactory.GetDatabase().Returns(_mongoDatabase);
@@ -284,7 +287,7 @@ namespace Spring.Data.MongoDb.Core
         }
 
         [Test]
-        public void FindByIdlFailsIfIdIsNull()
+        public void FindByIdFailsIfIdIsNull()
         {
             Assert.That(delegate { _template.FindById<Person>(null); }, Throws.TypeOf < ArgumentNullException>());
             Assert.That(delegate { _template.FindById<Person>("Person", null); }, Throws.TypeOf<ArgumentNullException>());
@@ -341,6 +344,236 @@ namespace Spring.Data.MongoDb.Core
             Assert.That(delegate { _template.FindOne<Person>("Person", null); }, Throws.TypeOf<ArgumentNullException>());                        
         }
 
+        [Test]
+        public void FindViaGeneric()
+        {
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<Person> collection = MongoTestHelper.CreateMockCollection<Person>("integration", "persons");
+            collection.ReturnsCollection(GenerateDummyDataPerson());
+            _mongoDatabase.GetCollection<Person>("persons").Returns(collection);
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+
+
+            _template.Find<Person>(query);
+
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            collection.Received(1).FindAs<Person>(query);
+        }
+
+        [Test]
+        public void FindViaName()
+        {
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<Person> collection = MongoTestHelper.CreateMockCollection<Person>("integration", "persons");
+            collection.ReturnsCollection(GenerateDummyDataPerson());
+            _mongoDatabase.GetCollection<Person>("persons").Returns(collection);
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+
+            _template.Find<Person>("persons", query);
+
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            collection.Received(1).FindAs<Person>(query);
+        }
+
+        [Test]
+        public void FindShouldFailIfNoCollectionNameProvided()
+        {
+            Assert.That(delegate { _template.Find<Person>("", null); }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void FindShouldFailIfNoQueryProvided()
+        {
+            Assert.That(delegate { _template.Find<Person>("Person", null); }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void FindAndModifyViaGeneric()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+            IMongoSortBy sortBy = new SortByBuilder<Person>().Ascending(p => p.Id);
+            IMongoUpdate update = new UpdateBuilder<Person>().Set(p => p.FirstName, "Thomas T");
+
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<Person> collection = MongoTestHelper.CreateMockCollection<Person>("integration", "persons");
+            collection.ReturnsCollection(GenerateDummyDataPerson());
+            _mongoDatabase.GetCollection<Person>("persons").Returns(collection);
+            collection.FindAndModify(query, sortBy, update, false, false).Returns(_okFindAndModifyResult);
+
+
+            _template.FindAndModify<Person>(query, sortBy, update);
+
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            collection.Received(1).FindAndModify(query, sortBy, update, false, false);            
+        }
+
+        [Test]
+        public void FindAndModifyViaName()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+            IMongoSortBy sortBy = new SortByBuilder<Person>().Ascending(p => p.Id);
+            IMongoUpdate update = new UpdateBuilder<Person>().Set(p => p.FirstName, "Thomas T");
+
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<Person> collection = MongoTestHelper.CreateMockCollection<Person>("integration", "persons");
+            collection.ReturnsCollection(GenerateDummyDataPerson());
+            _mongoDatabase.GetCollection<Person>("persons").Returns(collection);
+            collection.FindAndModify(query, sortBy, update, false, false).Returns(_okFindAndModifyResult);
+
+
+            _template.FindAndModify<Person>("persons", query, sortBy, update);
+
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            collection.Received(1).FindAndModify(query, sortBy, update, false, false);
+        }
+
+        [Test]
+        public void FindAndModifyWithUpsert()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+            IMongoSortBy sortBy = new SortByBuilder<Person>().Ascending(p => p.Id);
+            IMongoUpdate update = new UpdateBuilder<Person>().Set(p => p.FirstName, "Thomas T");
+            FindAndModifyOptions options = FindAndModifyOptions.Default();
+            options.Upsert(true);
+
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<Person> collection = MongoTestHelper.CreateMockCollection<Person>("integration", "persons");
+            collection.ReturnsCollection(GenerateDummyDataPerson());
+            _mongoDatabase.GetCollection<Person>("persons").Returns(collection);
+            collection.FindAndModify(query, sortBy, update, false, true).Returns(_okFindAndModifyResult);
+
+
+            _template.FindAndModify<Person>("persons", query, sortBy, update, options);
+
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            collection.Received(1).FindAndModify(query, sortBy, update, false, true);
+        }
+
+        [Test]
+        public void FindAndModifyWithReturnNew()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+            IMongoSortBy sortBy = new SortByBuilder<Person>().Ascending(p => p.Id);
+            IMongoUpdate update = new UpdateBuilder<Person>().Set(p => p.FirstName, "Thomas T");
+            FindAndModifyOptions options = FindAndModifyOptions.Default();
+            options.ReturnNew(true);
+
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<Person> collection = MongoTestHelper.CreateMockCollection<Person>("integration", "persons");
+            collection.ReturnsCollection(GenerateDummyDataPerson());
+            _mongoDatabase.GetCollection<Person>("persons").Returns(collection);
+            collection.FindAndModify(query, sortBy, update, true, false).Returns(_okFindAndModifyResult);
+
+
+            _template.FindAndModify<Person>("persons", query, sortBy, update, options);
+
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            collection.Received(1).FindAndModify(query, sortBy, update, true, false);
+        }
+        
+        [Test]
+        public void FindAndModifyShouldFailIfNoCollectionNameProvided()
+        {
+            Assert.That(delegate { _template.FindAndModify<Person>("", null, null, null, null); }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void FindAndModifyShouldFailIfNoQueryProvided()
+        {
+            Assert.That(delegate { _template.FindAndModify<Person>("Person", null, null, null, null); }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void FindAndModifyShouldFailIfNoSortByProvided()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+
+            Assert.That(delegate { _template.FindAndModify<Person>("Person", query, null, null, null); }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void FindAndModifyShouldFailIfNoUpdateProvided()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+            IMongoSortBy sortBy = new SortByBuilder<Person>().Ascending(p => p.FirstName);
+
+            Assert.That(delegate { _template.FindAndModify<Person>("Person", query, sortBy, null, null); }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void FindAndRemoveViaGeneric()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+            IMongoSortBy sortBy = new SortByBuilder<Person>().Ascending(p => p.Id);
+
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<Person> collection = MongoTestHelper.CreateMockCollection<Person>("integration", "persons");
+            collection.ReturnsCollection(GenerateDummyDataPerson());
+            collection.FindAndRemove(query, sortBy).Returns(_okFindAndModifyResult);
+            _mongoDatabase.GetCollection<Person>("persons").Returns(collection);
+
+
+            _template.FindAndRemove<Person>(query, sortBy);
+
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            collection.Received(1).FindAndRemove(query, sortBy);
+        }
+
+        [Test]
+        public void FindAndRemoveViaName()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+            IMongoSortBy sortBy = new SortByBuilder<Person>().Ascending(p => p.Id);
+
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<Person> collection = MongoTestHelper.CreateMockCollection<Person>("integration", "persons");
+            collection.ReturnsCollection(GenerateDummyDataPerson());
+            _mongoDatabase.GetCollection<Person>("persons").Returns(collection);
+            collection.FindAndRemove(query, sortBy).Returns(_okFindAndModifyResult);
+
+
+            _template.FindAndRemove<Person>("persons", query, sortBy);
+
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            collection.Received(1).FindAndRemove(query, sortBy);
+        }
+
+        [Test]
+        public void FindAndRemoveWithFailure()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+            IMongoSortBy sortBy = new SortByBuilder<Person>().Ascending(p => p.Id);
+
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<Person> collection = MongoTestHelper.CreateMockCollection<Person>("integration", "persons");
+            collection.ReturnsCollection(GenerateDummyDataPerson());
+            _mongoDatabase.GetCollection<Person>("persons").Returns(collection);
+            collection.FindAndRemove(query, sortBy).Returns(_failFindAndModifyResult);
+
+            Assert.That(delegate { _template.FindAndRemove<Person>("persons", query, sortBy); },
+                Throws.TypeOf<InvalidDataAccessApiUsageException>());
+        }
+
+        [Test]
+        public void FindAndRemoveShouldFailIfNoCollectionNameProvided()
+        {
+            Assert.That(delegate { _template.FindAndRemove<Person>("", null, null); }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void FindAndRemoveShouldFailIfNoQueryProvided()
+        {
+            Assert.That(delegate { _template.FindAndRemove<Person>("Person", null, null); }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void FindAndRemoveShouldFailIfNoSortByProvided()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+
+            Assert.That(delegate { _template.FindAndRemove<Person>("Person", query, null); }, Throws.TypeOf<ArgumentNullException>());
+        }
+        
         [Test]
         public void GetCollectionViaGeneric()
         {
@@ -510,17 +743,35 @@ namespace Spring.Data.MongoDb.Core
 
         private void CreateOkCommandResult()
         {
-            BsonDocument response = new BsonDocument();
+            var response = new BsonDocument();
             response.Add("ok", BsonValue.Create(true));
             _okComandResult = new CommandResult(null, response);
         }
 
         private void CreateFailCommandResult()
         {
-            BsonDocument response = new BsonDocument();
+            var response = new BsonDocument();
             response.Add("ok", BsonValue.Create(false));
             response.Add("errmsg", BsonValue.Create("Error happen from time to time"));
             _failComandResult = new CommandResult(null, response);
+        }
+
+        private void CreateOkFindAndModifyResult()
+        {
+            var response = new BsonDocument();
+            response.Add("ok", BsonValue.Create(true));
+            response.Add("value", (new Person()).ToBsonDocument());
+            _okFindAndModifyResult = new FindAndModifyResult();
+            _okFindAndModifyResult.Initialize(null, response);
+        }
+
+        private void CreateFailFindAndModifyResult()
+        {
+            var response = new BsonDocument();
+            response.Add("ok", BsonValue.Create(false));
+            response.Add("errmsg", BsonValue.Create("Error happen from time to time"));
+            _failFindAndModifyResult = new FindAndModifyResult();
+            _failFindAndModifyResult.Initialize(null, response);
         }
 
         private IList<Person> GenerateDummyDataPerson()

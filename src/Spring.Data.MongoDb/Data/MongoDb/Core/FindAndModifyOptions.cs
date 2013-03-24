@@ -15,11 +15,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace Spring.Data.MongoDb.Core
 {
     /// <summary>
@@ -31,7 +26,6 @@ namespace Spring.Data.MongoDb.Core
     {
         private bool _returnNew;
         private bool _upsert;
-        private bool _remove;
 
         private FindAndModifyOptions()
         {
@@ -54,12 +48,6 @@ namespace Spring.Data.MongoDb.Core
             return this;
         }
 
-        public FindAndModifyOptions Remove(bool remove)
-        {
-            _remove = remove;
-            return this;
-        }
-
         public bool IsReturnNew
         {
             get { return _returnNew; }
@@ -68,11 +56,6 @@ namespace Spring.Data.MongoDb.Core
         public bool IsUpsert
         {
             get { return _upsert; }
-        }
-
-        public bool IsRemove
-        {
-            get { return _remove; }
         }
     }
 }

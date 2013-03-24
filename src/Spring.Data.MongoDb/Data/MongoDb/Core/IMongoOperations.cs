@@ -430,8 +430,9 @@ namespace Spring.Data.MongoDb.Core
         /// </summary>
         /// <param name="query">the query class that specifies the criteria used to find a record and also an optional
         /// fields specification</param>
+        /// <param name="sortBy">the sort by clause to define the first document to remove</param>
         /// <returns>the converted object</returns>
-        T FindAndRemove<T>(IMongoQuery query);
+        T FindAndRemove<T>(IMongoQuery query, IMongoSortBy sortBy);
 
         /// <summary>
         /// Map the results of an ad-hoc query on the specified collection to a single instance of an object of the
@@ -441,11 +442,12 @@ namespace Spring.Data.MongoDb.Core
         /// The query is specified as a <see cref="QueryDocument"/> which can be created either using the <see cref="QueryBuilder{TDocument}"/> 
         /// or the more feature rich <see cref="QueryDocument"/>.
         /// </summary>
+        /// <param name="collectionName">name of the collection to retrieve the objects from</param>
         /// <param name="query">the query class that specifies the criteria used to find a record and also an optional
         /// fields specification</param>
-        /// <param name="collectionName">name of the collection to retrieve the objects from</param>
+        /// <param name="sortBy">the sort by clause to define the first document to remove</param>
         /// <returns>the converted object</returns>
-        T FindAndRemove<T>(string collectionName, IMongoQuery query);
+        T FindAndRemove<T>(string collectionName, IMongoQuery query, IMongoSortBy sortBy);
 
         /// <summary>
         /// Returns the number of documents for the given <see cref="QueryDocument"/> by querying the collection of the given

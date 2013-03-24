@@ -257,6 +257,42 @@ namespace Spring.Data.MongoDb.Core
         }
 
         /// <summary>
+        /// Map the results of an ad-hoc query on the collection for the entity class to a List of the specified type.
+        /// <p />
+        /// The query is specified as a <see cref="QueryDocument"/> which can be created either using the <see cref="QueryBuilder{TDocument}"/> or
+        /// the more feature rich <see cref="QueryDocument"/>.
+        /// </summary>
+        /// <param name="query">the query class that specifies the criteria used to find a record and also an optional
+        /// fields specification</param>
+        /// <returns>the List of converted objects</returns>
+        public IList<T> Find<T>(IMongoQuery query)
+        {
+            return Find<T>(DetermineCollectionName(typeof(T)), query);
+        }
+
+        /// <summary>
+        /// Map the results of an ad-hoc query on the specified collection to a List of the specified type.
+        /// <p />
+        /// The query is specified as a <see cref="QueryDocument"/> which can be created either using the <see cref="QueryBuilder{TDocument}"/> 
+        /// or the more feature rich <see cref="QueryDocument"/>.
+        /// </summary>
+        /// <param name="collectionName">name of the collection to retrieve the objects from</param>
+        /// <param name="query">the query class that specifies the criteria used to find a record and also an optional
+        /// fields specification</param>
+        /// <returns>the List of converted objects</returns>
+        public IList<T> Find<T>(string collectionName, IMongoQuery query)
+        {
+            AssertUtils.ArgumentHasText(collectionName, "collectionName");
+            AssertUtils.ArgumentNotNull(query, "query");
+
+            return Execute<T, IList<T>>(collectionName, collection =>
+                {
+                    var result = collection.FindAs<T>(query);
+                    return result.ToList();
+                });
+        }
+
+        /// <summary>
         /// Query for a list of objects of type T from the collection used by the entity class.
         /// <p />
         /// If your collection does not contain a homogeneous collection of types, this operation will not be an 
@@ -278,11 +314,68 @@ namespace Spring.Data.MongoDb.Core
         /// <returns>the converted collection</returns>
         public IList<T> FindAll<T>(string collectionName)
         {
+            AssertUtils.ArgumentHasText(collectionName, "collectionName");
+
             return Execute<T, IList<T>>(collectionName, collection =>
                 {
                     var result = collection.FindAllAs<T>();
                     return result.ToList();
                 });
+        }
+
+        public T FindAndModify<T>(IMongoQuery query, IMongoSortBy sortBy, IMongoUpdate update)
+        {
+            return FindAndModify<T>(DetermineCollectionName(typeof(T)), query, sortBy, update);
+        }
+
+        public T FindAndModify<T>(string collectionName, IMongoQuery query, IMongoSortBy sortBy, IMongoUpdate update)
+        {
+            return FindAndModify<T>(DetermineCollectionName(typeof (T)), query, sortBy, update,
+                                    FindAndModifyOptions.Default());
+        }
+
+        public T FindAndModify<T>(IMongoQuery query, IMongoSortBy sortBy, IMongoUpdate update, FindAndModifyOptions options)
+        {
+            return FindAndModify<T>(DetermineCollectionName(typeof(T)), query, sortBy, update, options);
+        }
+
+        public T FindAndModify<T>(string collectionName, IMongoQuery query, IMongoSortBy sortBy, IMongoUpdate update, FindAndModifyOptions options)
+        {
+            AssertUtils.ArgumentHasText(collectionName, "collectionName");
+            AssertUtils.ArgumentNotNull(query, "query");
+            AssertUtils.ArgumentNotNull(sortBy, "sortBy");
+            AssertUtils.ArgumentNotNull(update, "update");
+
+            return Execute<T, T>(collectionName, collection =>
+                {
+                    FindAndModifyResult result = collection.FindAndModify(query, sortBy, update, options.IsReturnNew,
+                                                                          options.IsUpsert);
+                    if (!result.Ok)
+                        throw new MongoCommandException(result.ErrorMessage);
+
+                    return result.GetModifiedDocumentAs<T>();
+                });
+        }
+
+        public T FindAndRemove<T>(IMongoQuery query, IMongoSortBy sortBy)
+        {
+            return FindAndRemove<T>(DetermineCollectionName(typeof(T)), query, sortBy);
+        }
+
+        public T FindAndRemove<T>(string collectionName, IMongoQuery query, IMongoSortBy sortBy) 
+        {
+            AssertUtils.ArgumentHasText(collectionName, "collectionName");
+            AssertUtils.ArgumentNotNull(query, "query");
+            AssertUtils.ArgumentNotNull(sortBy, "sortBy");
+
+            return Execute<T, T>(collectionName, collection =>
+            {
+                FindAndModifyResult result = collection.FindAndRemove(query, sortBy);
+                if (!result.Ok)
+                    throw new MongoCommandException(result.ErrorMessage);
+
+                return result.GetModifiedDocumentAs<T>();
+            });
         }
 
         /// <summary>
@@ -295,7 +388,6 @@ namespace Spring.Data.MongoDb.Core
         {
             return FindById<T>(DetermineCollectionName(typeof(T)), id);
         }
-
 
         /// <summary>
         /// Returns the document with the given id from the given collection mapped onto the given target class.
@@ -626,46 +718,6 @@ namespace Spring.Data.MongoDb.Core
         }
 
         public GeoNearResult<T> GeoNear<T>(string collectionName, IMongoQuery query, double x, double y, int limit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IList<T> Find<T>(IMongoQuery query)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IList<T> Find<T>(string collectionName, IMongoQuery query)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T FindAndModify<T>(IMongoQuery query, IMongoSortBy sortBy, IMongoUpdate update)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T FindAndModify<T>(string collectionName, IMongoQuery query, IMongoSortBy sortBy, IMongoUpdate update)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T FindAndModify<T>(IMongoQuery query, IMongoSortBy sortBy, IMongoUpdate update, FindAndModifyOptions options)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T FindAndModify<T>(string collectionName, IMongoQuery query, IMongoSortBy sortBy, IMongoUpdate update, FindAndModifyOptions options)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T FindAndRemove<T>(IMongoQuery query)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T FindAndRemove<T>(string collectionName, IMongoQuery query)
         {
             throw new NotImplementedException();
         }

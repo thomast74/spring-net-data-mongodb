@@ -313,11 +313,11 @@ namespace Spring.Data.MongoDb.Core
         /// The query is specified as a <see cref="Query"/> which can be created either using the <see cref="QueryBuilder{TDocument}"/> 
         /// or the more feature rich <see cref="Query"/>.
         /// </summary>
+        /// <param name="collectionName">name of the collection to retrieve the objects from</param>
         /// <param name="query">the query class that specifies the criteria used to find a record and also an optional
         /// fields specification</param>
-        /// <param name="collectionName">name of the collection to retrieve the objects from</param>
         /// <returns>the converted object</returns>
-        T FindOne<T>(IMongoQuery query, string collectionName);
+        T FindOne<T>(string collectionName, IMongoQuery query);
 
         /// <summary>
         /// Map the results of an ad-hoc query on the collection for the entity class to a List of the specified type.

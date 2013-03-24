@@ -138,6 +138,46 @@ namespace Spring.Data.MongoDb.Core
         }
 
         [Test]
+        public void FindByIdShouldReturnPerson()
+        {
+            Person person = _template.FindById<Person>(new ObjectId("000000000000000000000001"));
+            
+            Assert.That(person, Is.Not.Null);
+            Assert.That(person.Id, Is.EqualTo(new ObjectId("000000000000000000000001")));
+            Assert.That(person.FirstName, Is.EqualTo("Thomas"));
+        }
+
+        [Test]
+        public void FindByIdShouldReturnNullIfNotFound()
+        {
+            Person person = _template.FindById<Person>(new ObjectId("000000000000000000000010"));
+
+            Assert.That(person, Is.Null);
+        }
+
+        [Test]
+        public void FindOneShouldReturnPerson()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+
+            Person person = _template.FindOne<Person>(query);
+
+            Assert.That(person, Is.Not.Null);
+            Assert.That(person.Id, Is.EqualTo(new ObjectId("000000000000000000000001")));
+            Assert.That(person.FirstName, Is.EqualTo("Thomas"));
+        }
+
+        [Test]
+        public void FindOneShouldReturnNullIfNotFound()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Liar");
+
+            Person person = _template.FindOne<Person>(query);
+
+            Assert.That(person, Is.Null);
+        }
+
+        [Test]
         public void GetCollectionViaGeneric()
         {
             var collection = _template.GetCollection<Person>();

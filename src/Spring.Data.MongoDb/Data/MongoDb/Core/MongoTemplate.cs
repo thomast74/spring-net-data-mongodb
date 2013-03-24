@@ -196,6 +196,65 @@ namespace Spring.Data.MongoDb.Core
                 });
         }
 
+        /// <summary>
+        /// Executes a command on the given Func.
+        /// </summary>
+        /// <typeparam name="TType">Type to determin the collection name</typeparam>
+        /// <typeparam name="TReturn">The return type of the execution</typeparam>
+        /// <param name="collectionCallback">the Func that will be run for the retrived collection </param>
+        /// <returns></returns>
+        public TReturn Execute<TType, TReturn>(Func<MongoCollection, TReturn> collectionCallback)
+        {
+            return Execute<TType, TReturn>(DetermineCollectionName(typeof(TType)), collectionCallback);
+        }
+
+        /// <summary>
+        /// Executes a command on the given Func.
+        /// </summary>
+        /// <typeparam name="T">The type of the collection</typeparam>
+        /// <typeparam name="TReturn">The return type of the execution</typeparam>
+        /// <param name="collectionName">the collection to use for the execution</param>
+        /// <param name="collectionCallback">the Func that will be run for the retrived collection </param>
+        /// <returns></returns>
+        public virtual TReturn Execute<T, TReturn>(string collectionName, Func<MongoCollection, TReturn> collectionCallback)
+        {
+            AssertUtils.ArgumentHasText(collectionName, "collectionName");
+            AssertUtils.ArgumentNotNull(collectionCallback, "collectionCallback");
+
+            VerifyCollectionNameIsValid(collectionName);
+
+            try
+            {
+                MongoCollection<T> collection = GetCollection<T>(collectionName);
+                return collectionCallback(collection);
+            }
+            catch (Exception e)
+            {
+                throw PotentiallyConvertException(e);
+            }
+        }
+
+        /// <summary>
+        /// Executes the given callback action, translating any exceptions as necessary.
+        /// <p />
+        /// Allows for returning a result object, that is a domain object or a collection of domain objects.
+        /// </summary>
+        /// <param name="databaseCallback">callback object that specifies the MongoDB actions to perform on the passed
+        /// in DB instance.</param>
+        /// <returns>a result object returned by the action or <code>null</code></returns>
+        public TReturn Execute<TReturn>(Func<MongoDatabase, TReturn> databaseCallback)
+        {
+            AssertUtils.ArgumentNotNull(databaseCallback, "databaseCallback");
+
+            try
+            {
+                return databaseCallback(GetDatabase());
+            }
+            catch (Exception e)
+            {
+                throw PotentiallyConvertException(e);
+            }
+        }
 
         /// <summary>
         /// Query for a list of objects of type T from the collection used by the entity class.
@@ -224,6 +283,66 @@ namespace Spring.Data.MongoDb.Core
                     var result = collection.FindAllAs<T>();
                     return result.ToList();
                 });
+        }
+
+        /// <summary>
+        /// Returns a document with the given id mapped onto the given type. The collection the query is ran against 
+        /// will be derived from the given target type as well.
+        /// </summary>
+        /// <param name="id">the id of the document to return.</param>
+        /// <returns>the document with the given id mapped onto the given target type.</returns>
+        public T FindById<T>(object id)
+        {
+            return FindById<T>(DetermineCollectionName(typeof(T)), id);
+        }
+
+
+        /// <summary>
+        /// Returns the document with the given id from the given collection mapped onto the given target class.
+        /// </summary>
+        /// <param name="id">the id of the document to return</param>
+        /// <param name="collectionName">the collection to query for the document</param>
+        /// <returns>the document with the given id mapped onto the given target type.</returns>
+        public T FindById<T>(string collectionName, object id)
+        {
+            AssertUtils.ArgumentHasText(collectionName, "collectionName");
+            AssertUtils.ArgumentNotNull(id, "id");
+
+            return Execute<T, T>(collectionName, collection => collection.FindOneByIdAs<T>(BsonValue.Create(id)));
+        }
+
+        /// <summary>
+        /// Map the results of an ad-hoc query on the collection for the entity class to a single instance of an 
+        /// object of the specified type.
+        /// <p />
+        /// The query is specified as a <see cref="QueryDocument"/> which can be created either using the <see cref="QueryBuilder{TDocument}"/> 
+        /// or the more feature rich <see cref="QueryDocument"/>.
+        /// </summary>
+        /// <param name="query">the query class that specifies the criteria used to find a record and also an optional
+        /// fields specification</param>
+        /// <returns>the converted object</returns>
+        public T FindOne<T>(IMongoQuery query)
+        {
+            return FindOne<T>(DetermineCollectionName(typeof (T)), query);
+        }
+
+        /// <summary>
+        /// Map the results of an ad-hoc query on the specified collection to a single instance of an object of the
+        /// specified type.
+        /// <p />
+        /// The query is specified as a <see cref="Query"/> which can be created either using the <see cref="QueryBuilder{TDocument}"/> 
+        /// or the more feature rich <see cref="Query"/>.
+        /// </summary>
+        /// <param name="collectionName">name of the collection to retrieve the objects from</param>
+        /// <param name="query">the query class that specifies the criteria used to find a record and also an optional
+        /// fields specification</param>
+        /// <returns>the converted object</returns>
+        public T FindOne<T>(string collectionName, IMongoQuery query)
+        {
+            AssertUtils.ArgumentHasText(collectionName, "collectionName");
+            AssertUtils.ArgumentNotNull(query, "query");
+
+            return Execute<T, T>(collectionName, collection => collection.FindOneAs<T>(query));
         }
 
         /// <summary>
@@ -285,67 +404,8 @@ namespace Spring.Data.MongoDb.Core
                     return db.GetCollectionNames().ToList();
                 });
         }
+       
         
-        /// <summary>
-        /// Executes a command on the given Func.
-        /// </summary>
-        /// <typeparam name="TType">Type to determin the collection name</typeparam>
-        /// <typeparam name="TReturn">The return type of the execution</typeparam>
-        /// <param name="collectionCallback">the Func that will be run for the retrived collection </param>
-        /// <returns></returns>
-        public TReturn Execute<TType, TReturn>(Func<MongoCollection, TReturn> collectionCallback)
-        {
-            return Execute<TType, TReturn>(DetermineCollectionName(typeof(TType)), collectionCallback);
-	    }
-
-        /// <summary>
-        /// Executes a command on the given Func.
-        /// </summary>
-        /// <typeparam name="T">The type of the collection</typeparam>
-        /// <typeparam name="TReturn">The return type of the execution</typeparam>
-        /// <param name="collectionName">the collection to use for the execution</param>
-        /// <param name="collectionCallback">the Func that will be run for the retrived collection </param>
-        /// <returns></returns>
-        public virtual TReturn Execute<T, TReturn>(string collectionName, Func<MongoCollection, TReturn> collectionCallback)
-        {
-            AssertUtils.ArgumentHasText(collectionName, "collectionName");
-            AssertUtils.ArgumentNotNull(collectionCallback, "collectionCallback");
-
-            VerifyCollectionNameIsValid(collectionName);
-
-            try
-            {
-                MongoCollection<T> collection = GetCollection<T>(collectionName);
-                return collectionCallback(collection);
-            }
-            catch (Exception e)
-            {
-                throw PotentiallyConvertException(e);
-            }
-        }
-
-        /// <summary>
-        /// Executes the given callback action, translating any exceptions as necessary.
-        /// <p />
-        /// Allows for returning a result object, that is a domain object or a collection of domain objects.
-        /// </summary>
-        /// <param name="databaseCallback">callback object that specifies the MongoDB actions to perform on the passed
-        /// in DB instance.</param>
-        /// <returns>a result object returned by the action or <code>null</code></returns>
-        public TReturn Execute<TReturn>(Func<MongoDatabase, TReturn> databaseCallback)
-        {
-            AssertUtils.ArgumentNotNull(databaseCallback, "databaseCallback");
-
-            try
-            {
-                return databaseCallback(GetDatabase());
-            }
-            catch (Exception e)
-            {
-                throw PotentiallyConvertException(e);
-            }
-        }
-
         /// <summary>
         /// Gets the database from the <see cref="IMongoDatabaseFactory"/>
         /// </summary>
@@ -570,32 +630,12 @@ namespace Spring.Data.MongoDb.Core
             throw new NotImplementedException();
         }
 
-        public T FindOne<T>(IMongoQuery query)
+        public IList<T> Find<T>(IMongoQuery query)
         {
             throw new NotImplementedException();
         }
 
-        public T FindOne<T>(IMongoQuery query, string collectionName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public System.Collections.Generic.IList<T> Find<T>(IMongoQuery query)
-        {
-            throw new NotImplementedException();
-        }
-
-        public System.Collections.Generic.IList<T> Find<T>(string collectionName, IMongoQuery query)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T FindById<T>(object id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T FindById<T>(string collectionName, object id)
+        public IList<T> Find<T>(string collectionName, IMongoQuery query)
         {
             throw new NotImplementedException();
         }

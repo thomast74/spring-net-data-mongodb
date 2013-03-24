@@ -256,6 +256,92 @@ namespace Spring.Data.MongoDb.Core
         }
 
         [Test]
+        public void FindByIdViaGeneric()
+        {
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<Person> collection = MongoTestHelper.CreateMockCollection<Person>("integration", "persons");
+            collection.ReturnsCollection(GenerateDummyDataPerson());
+            _mongoDatabase.GetCollection<Person>("persons").Returns(collection);
+
+            _template.FindById<Person>(1);
+
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            collection.Received(1).FindOneByIdAs<Person>(1);            
+        }
+
+        [Test]
+        public void FindByIdViaName()
+        {
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<Person> collection = MongoTestHelper.CreateMockCollection<Person>("integration", "persons");
+            collection.ReturnsCollection(GenerateDummyDataPerson());
+            _mongoDatabase.GetCollection<Person>("persons").Returns(collection);
+
+            _template.FindById<Person>("persons", 1);
+
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            collection.Received(1).FindOneByIdAs<Person>(1);
+        }
+
+        [Test]
+        public void FindByIdlFailsIfIdIsNull()
+        {
+            Assert.That(delegate { _template.FindById<Person>(null); }, Throws.TypeOf < ArgumentNullException>());
+            Assert.That(delegate { _template.FindById<Person>("Person", null); }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void FindByIdlFailsIfNoCollectionNameProvided()
+        {
+            Assert.That(delegate { _template.FindById<Person>("", 0); }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void FindOneViaGeneric()
+        {
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<Person> collection = MongoTestHelper.CreateMockCollection<Person>("integration", "persons");
+            collection.ReturnsCollection(GenerateDummyDataPerson());
+            _mongoDatabase.GetCollection<Person>("persons").Returns(collection);
+
+
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+
+            _template.FindOne<Person>(query);
+
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            collection.Received(1).FindOneAs<Person>(query);                        
+        }
+
+        [Test]
+        public void FindOneViaName()
+        {
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<Person> collection = MongoTestHelper.CreateMockCollection<Person>("integration", "persons");
+            collection.ReturnsCollection(GenerateDummyDataPerson());
+            _mongoDatabase.GetCollection<Person>("persons").Returns(collection);
+
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+
+            _template.FindOne<Person>("persons", query);
+
+            _mongoDatabase.Received(1).GetCollection<Person>("persons");
+            collection.Received(1).FindOneAs<Person>(query);                        
+        }
+
+        [Test]
+        public void FindOneShouldFailIfNoCollectionNameProvided()
+        {
+            Assert.That(delegate { _template.FindOne<Person>("", null); }, Throws.TypeOf<ArgumentNullException>());            
+        }
+
+        [Test]
+        public void FindOneShouldFailIfNoQueryProvided()
+        {
+            Assert.That(delegate { _template.FindOne<Person>("Person", null); }, Throws.TypeOf<ArgumentNullException>());                        
+        }
+
+        [Test]
         public void GetCollectionViaGeneric()
         {
             var mongoCollection = MongoTestHelper.CreateMockCollection<Person>("unit", "persons");

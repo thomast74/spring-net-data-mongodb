@@ -108,6 +108,53 @@ namespace Spring.Data.MongoDb.Core
         }
 
         /// <summary>
+        /// Returns the number of documents of the collection
+        /// </summary>
+        /// <typeparam name="T">the Type from where to get the collection</typeparam>
+        /// <returns></returns>
+        public long Count<T>()
+        {
+            return Count(DetermineCollectionName(typeof(T)));
+        }
+        
+        /// <summary>
+        /// Returns the number of documents of the collection
+        /// </summary>
+        /// <param name="collectionName">the name of the collection to get the count of</param>
+        /// <returns></returns>
+        public long Count(string collectionName)
+        {
+            AssertUtils.ArgumentHasText(collectionName, collectionName);
+
+            return Execute<long>(collectionName, collection => collection.Count());
+        }
+
+        /// <summary>
+        /// Returns the number of documents for the given <see cref="QueryDocument"/> by querying the collection of the given
+        /// entity class.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public long Count<T>(IMongoQuery query)
+        {
+            return Count(DetermineCollectionName(typeof (T)), query);
+        }
+
+        /// <summary>
+        /// Returns the number of documents for the given <see cref="QueryDocument"/> querying the given collection.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="collectionName">collectionName must not be <code>null</code> empty.</param>
+        /// <returns></returns>
+        public long Count(string collectionName, IMongoQuery query)
+        {
+            AssertUtils.ArgumentHasText(collectionName, "collectionName");
+            AssertUtils.ArgumentNotNull(query, "query");
+
+            return Execute<long>(collectionName, collection => collection.Count(query));
+        }
+
+        /// <summary>
         /// Create an uncapped collection with a name based on the provided entity type.
         /// </summary>
         /// <returns>the created collection</returns>
@@ -226,6 +273,31 @@ namespace Spring.Data.MongoDb.Core
             try
             {
                 MongoCollection<T> collection = GetCollection<T>(collectionName);
+                return collectionCallback(collection);
+            }
+            catch (Exception e)
+            {
+                throw PotentiallyConvertException(e);
+            }
+        }
+
+        /// <summary>
+        /// Executes a command on the given Func.
+        /// </summary>
+        /// <typeparam name="TReturn">The return type of the execution</typeparam>
+        /// <param name="collectionName">the collection to use for the execution</param>
+        /// <param name="collectionCallback">the Func that will be run for the retrived collection </param>
+        /// <returns></returns>
+        public virtual TReturn Execute<TReturn>(string collectionName, Func<MongoCollection, TReturn> collectionCallback)
+        {
+            AssertUtils.ArgumentHasText(collectionName, "collectionName");
+            AssertUtils.ArgumentNotNull(collectionCallback, "collectionCallback");
+
+            VerifyCollectionNameIsValid(collectionName);
+
+            try
+            {
+                MongoCollection collection = GetCollection(collectionName);
                 return collectionCallback(collection);
             }
             catch (Exception e)
@@ -475,6 +547,33 @@ namespace Spring.Data.MongoDb.Core
                     }
                 });
         }
+
+        /// <summary>
+        /// Get a collection by name, creating it if it doesn't exist.
+        /// <p />
+        /// Translate any exceptions as necessary.
+        /// </summary>
+        /// <typeparam name="T">Class map the retrieved collection to provided type</typeparam>
+        /// <param name="collectionName">name of the collection</param>
+        /// <returns>an existing collection or a newly created one.</returns>
+        public MongoCollection GetCollection(string collectionName)
+        {
+            AssertUtils.ArgumentHasText(collectionName, "collectionName");
+
+            VerifyCollectionNameIsValid(collectionName);
+
+            return Execute<MongoCollection>(db =>
+            {
+                try
+                {
+                    return db.GetCollection(collectionName);
+                }
+                catch (Exception e)
+                {
+                    throw PotentiallyConvertException(e);
+                }
+            });
+        }
         
         /// <summary>
         /// The collection name used for the specified type by this template.
@@ -718,16 +817,6 @@ namespace Spring.Data.MongoDb.Core
         }
 
         public GeoNearResult<T> GeoNear<T>(string collectionName, IMongoQuery query, double x, double y, int limit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long Count<T>(IMongoQuery query)
-        {
-            throw new NotImplementedException();
-        }
-
-        public long Count(string collectionName, IMongoQuery query)
         {
             throw new NotImplementedException();
         }

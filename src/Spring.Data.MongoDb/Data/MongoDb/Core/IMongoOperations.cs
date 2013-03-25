@@ -450,6 +450,20 @@ namespace Spring.Data.MongoDb.Core
         T FindAndRemove<T>(string collectionName, IMongoQuery query, IMongoSortBy sortBy);
 
         /// <summary>
+        /// Returns the number of documents of the collection
+        /// </summary>
+        /// <typeparam name="T">the Type from where to get the collection</typeparam>
+        /// <returns></returns>
+        long Count<T>();
+
+        /// <summary>
+        /// Returns the number of documents of the collection
+        /// </summary>
+        /// <param name="collectionName">the name of the collection to get the count of</param>
+        /// <returns></returns>
+        long Count(string collectionName);
+
+        /// <summary>
         /// Returns the number of documents for the given <see cref="QueryDocument"/> by querying the collection of the given
         /// entity class.
         /// </summary>

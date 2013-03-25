@@ -69,6 +69,24 @@ namespace Spring.Data.MongoDb.Core
         }
 
         [Test]
+        public void CountForAllDocuments()
+        {
+            long result = _template.Count("persons");
+
+            Assert.That(result, Is.EqualTo(5));
+        }
+
+        [Test]
+        public void CountWithQuery()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+
+            long result = _template.Count("persons", query);
+
+            Assert.That(result, Is.EqualTo(1));
+        }
+
+        [Test]
         public void CreateCollectionWithDefaultOptions()
         {
             _template.CreateCollection<Person>("jokes");

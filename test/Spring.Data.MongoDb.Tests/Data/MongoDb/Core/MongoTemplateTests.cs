@@ -186,6 +186,88 @@ namespace Spring.Data.MongoDb.Core
         }
 
         [Test]
+        public void CountViaGeneric()
+        {
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<BsonDocument> collection = MongoTestHelper.CreateMockCollection<BsonDocument>("integration", "persons");
+            collection.Count().Returns(1);
+            _mongoDatabase.GetCollection("persons").Returns(collection);
+
+
+            long result = _template.Count<Person>();
+
+            _mongoDatabase.Received(1).GetCollection("persons");
+            collection.Received(1).Count();
+        }
+
+        [Test]
+        public void CountViaName()
+        {
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<BsonDocument> collection = MongoTestHelper.CreateMockCollection<BsonDocument>("integration", "persons");
+            collection.Count().Returns(1);
+            _mongoDatabase.GetCollection("persons").Returns(collection);
+
+
+            long result = _template.Count("persons");
+
+            _mongoDatabase.Received(1).GetCollection("persons");
+            collection.Received(1).Count();
+        }
+
+        [Test]
+        public void CountWithQueryViaGeneric()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<BsonDocument> collection = MongoTestHelper.CreateMockCollection<BsonDocument>("integration", "persons");
+            collection.Count().Returns(1);
+            _mongoDatabase.GetCollection("persons").Returns(collection);
+
+
+            long result = _template.Count<Person>(query);
+
+            _mongoDatabase.Received(1).GetCollection("persons");
+            collection.Received(1).Count(query);
+        }
+
+        [Test]
+        public void CountWithQueryViaName()
+        {
+            IMongoQuery query = new QueryBuilder<Person>().Where(p => p.FirstName == "Thomas");
+
+            _mongoDatabase.ClearReceivedCalls();
+            MongoCollection<BsonDocument> collection = MongoTestHelper.CreateMockCollection<BsonDocument>("integration", "persons");
+            collection.Count().Returns(1);
+            _mongoDatabase.GetCollection("persons").Returns(collection);
+
+
+            long result = _template.Count("persons", query);
+
+            _mongoDatabase.Received(1).GetCollection("persons");
+            collection.Received(1).Count(query);
+        }
+
+        [Test]
+        public void CountShouldFailWhenNoCollectionName()
+        {
+            Assert.That(delegate { _template.Count(""); }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void CountWithQueryShouldFailWhenNoCollectionName()
+        {
+            Assert.That(delegate { _template.Count("", null); }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void CountWithQueryShouldFailWhenNoQueryProvided()
+        {
+            Assert.That(delegate { _template.Count("persons", null); }, Throws.TypeOf<ArgumentNullException>());            
+        }
+
+        [Test]
         public void DropCollectionViaGeneric()
         {
             _mongoDatabase.ClearReceivedCalls();
